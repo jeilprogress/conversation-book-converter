@@ -64,7 +64,13 @@ function sameSpeaker(a, b) {
 }
 
 function StandaloneMiddleText({ item }) {
-  return <div className="book-middle-block" data-middle-text-id={item.id}>{formatManualMessageText(item.text).split('\n').map((line, index, lines) => <span key={index}>{line}{index < lines.length - 1 && <br />}</span>)}</div>
+  const text = formatManualMessageText(item.text)
+  return (
+    <div className="book-middle-block" data-middle-text-id={item.id}>
+      {text && <div className="book-middle-label">{text.split('\n').map((line, index, lines) => <span key={index}>{line}{index < lines.length - 1 && <br />}</span>)}</div>}
+      {item.dnd && <div className="book-dnd-line"><span className="book-dnd-moon" aria-hidden="true">☾</span> {(item.dndName || 'Name').trim() || 'Name'} has notifications silenced</div>}
+    </div>
+  )
 }
 
 function PasteTextPanel({ value, onChange, onPrepare, pendingImport, onPendingChange, onConfirm, onCancel, editor = false }) {
@@ -522,7 +528,7 @@ function ManualIMessageQuickComposer({
             <button type="button" className="quick-middle-select" onClick={() => onSelectMiddleText(item.id)}>
               <span>{index + 1}</span>
               <div>
-                <b>{item.text || 'Untitled middle text'}</b>
+                <b>{item.text || (item.dnd ? '☾ Notifications silenced' : 'Untitled middle text')}</b>
                 <small>{item.afterMessageId ? 'Placed after a message' : 'Placed at the beginning'}</small>
               </div>
             </button>
@@ -536,6 +542,147 @@ function ManualIMessageQuickComposer({
 
 function NewTweetButton({ onClick }) {
   return <button type="button" className="floating-add" onClick={onClick}>＋ Add post</button>
+}
+
+
+function MiddleDndFields({ item, onUpdate, defaultName = '' }) {
+  return (
+    <div className="middle-dnd-controls">
+      <label className="middle-dnd-toggle">
+        <input type="checkbox" checked={Boolean(item.dnd)} onChange={e => onUpdate(item.id, {
+          dnd: e.target.checked,
+          dndName: e.target.checked ? (item.dndName || defaultName || 'Name') : (item.dndName || ''),
+        })} />
+        <span>☾ Add Do Not Disturb notice</span>
+      </label>
+      {item.dnd && <label>Silenced contact name
+        <input value={item.dndName || ''} onChange={e => onUpdate(item.id, { dndName: e.target.value })} placeholder="Name" />
+      </label>}
+    </div>
+  )
+}
+
+function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExportPdf, status }) {
+  const [topName, setTopName] = useState('Acielo Vergara')
+  const [autoCount, setAutoCount] = useState(true)
+  const [countLine, setCountLine] = useState('2 New Notifications')
+  const [cards, setCards] = useState([
+    { id: uid(), app: 'message', sender: 'my zielle', message: 'Mahal kita, eh.' },
+    { id: uid(), app: 'message', sender: 'my zielle', message: 'Tapos mang-iiwan ka nanaman? Ako nanaman ang tanga?' },
+  ])
+  const [dndEnabled, setDndEnabled] = useState(false)
+  const [dndText, setDndText] = useState('Do Not Disturb')
+  function patchCard(id, changes) {
+    setCards(old => old.map(card => card.id === id ? { ...card, ...changes } : card))
+  }
+  function addCard() {
+    setCards(old => [...old, { id: uid(), app: 'message', sender: '', message: '' }])
+  }
+  function moveCard(index, amount) {
+    setCards(old => {
+      const destination = index + amount
+      if (destination < 0 || destination >= old.length) return old
+      const next = [...old]
+      const [item] = next.splice(index, 1)
+      next.splice(destination, 0, item)
+      return next
+    })
+  }
+  const heading = autoCount
+    ? String(cards.length) + ' New Notification' + (cards.length === 1 ? '' : 's')
+    : countLine
+
+  return (
+    <main className="notification-mode-editor">
+      <div className="editor-toolbar">
+        <div>
+          <div className="eyebrow">LOCKSCREEN NOTIFICATIONS · BOOK</div>
+          <strong>{cards.length} notification{cards.length === 1 ? '' : 's'} · compact black-and-white layout</strong>
+        </div>
+        <div className="toolbar-right">
+          <button type="button" className="ghost" onClick={onExportPng}>Export PNG</button>
+          <button type="button" className="primary" onClick={onExportPdf}>Export PDF</button>
+        </div>
+      </div>
+      <div className="notification-editor-grid">
+        <section className="notification-edit-panel">
+          <div className="panel-heading"><span>Notification editor</span><span>LIVE</span></div>
+          <div className="notification-edit-content">
+            <label>Top name
+              <input value={topName} onChange={e => setTopName(e.target.value)} placeholder="Character name" />
+            </label>
+            <label className="notification-check-field">
+              <input type="checkbox" checked={autoCount} onChange={e => setAutoCount(e.target.checked)} />
+              <span>Automatically count notifications</span>
+            </label>
+            {!autoCount && <label>Custom count heading
+              <input value={countLine} onChange={e => setCountLine(e.target.value)} placeholder="2 New Notifications" />
+            </label>}
+            <div className="notification-edit-heading">Notification cards</div>
+            {cards.map((card, index) => (
+              <div className="notification-edit-card" key={card.id}>
+                <div className="notification-edit-card-top">
+                  <b>Notification {index + 1}</b>
+                  <div>
+                    <button type="button" title="Move up" disabled={index === 0} onClick={() => moveCard(index, -1)}>↑</button>
+                    <button type="button" title="Move down" disabled={index === cards.length - 1} onClick={() => moveCard(index, 1)}>↓</button>
+                    <button type="button" title="Delete notification" onClick={() => setCards(old => old.filter(entry => entry.id !== card.id))}>×</button>
+                  </div>
+                </div>
+                <label>App name
+                  <input value={card.app} onChange={e => patchCard(card.id, { app: e.target.value })} placeholder="message" />
+                </label>
+                <label>Contact name
+                  <input value={card.sender} onChange={e => patchCard(card.id, { sender: e.target.value })} placeholder="Sender" />
+                </label>
+                <label>Message
+                  <textarea rows={3} value={card.message} onChange={e => patchCard(card.id, { message: e.target.value })} placeholder="Type the notification…" />
+                </label>
+              </div>
+            ))}
+            <button type="button" className="notification-add-button" onClick={addCard}>＋ Add notification</button>
+            <div className="notification-dnd-settings">
+              <label className="notification-check-field">
+                <input type="checkbox" checked={dndEnabled} onChange={e => setDndEnabled(e.target.checked)} />
+                <span>☾ Do Not Disturb footer</span>
+              </label>
+              {dndEnabled && <label>Footer text
+                <input value={dndText} onChange={e => setDndText(e.target.value)} placeholder="Do Not Disturb" />
+              </label>}
+            </div>
+            <label>Page width
+              <select value={settings.page.label} onChange={e => {
+                const next = Object.values(PAGE_SIZES).find(size => size.label === e.target.value)
+                if (next) setSettings(previous => ({ ...previous, page: next }))
+              }}>
+                {Object.values(PAGE_SIZES).map(size => <option key={size.label} value={size.label}>{size.label}</option>)}
+              </select>
+            </label>
+          </div>
+        </section>
+        <section className="preview-panel notification-preview-panel">
+          <div className="panel-heading"><span>Book preview</span><span>{settings.page.width} mm wide</span></div>
+          <div className="pages-stage">
+            <div ref={pageRef} className="book-page notification-book-page" style={{ width: settings.page.width + 'mm' }}>
+              {topName && <div className="notification-top-name">{topName}</div>}
+              <div className="notification-count-line">{heading}</div>
+              <div className="notification-preview-stack">
+                {cards.map(card => (
+                  <div className="notification-preview-card" key={card.id}>
+                    <div className="notification-app-label">{card.app}</div>
+                    <div className="notification-contact-label">{card.sender}</div>
+                    <div className="notification-message-text">{card.message}</div>
+                  </div>
+                ))}
+              </div>
+              {dndEnabled && <div className="notification-dnd-footer"><span aria-hidden="true">☾</span> {dndText}</div>}
+            </div>
+          </div>
+        </section>
+      </div>
+      {status && <div className="notification-export-status" role="status">{status}</div>}
+    </main>
+  )
 }
 
 export default function App() {
@@ -627,6 +774,8 @@ export default function App() {
       setSelectedId(firstTweet.id)
       setStatus('New tweet ready. Choose a character and start typing.')
       setScreen('editor')
+    } else if (nextMode === 'notifications') {
+      setScreen('notifications')
     } else {
       setScreen('upload')
     }
@@ -1416,7 +1565,7 @@ export default function App() {
       return
     }
 
-    const modeLabel = mode === 'tweet' ? 'Tweet' : 'iMessage'
+    const modeLabel = mode === 'tweet' ? 'Tweet' : mode === 'notifications' ? 'Notifications' : 'iMessage'
     setStatus(`Rendering complete ${modeLabel} book…`)
     const slices = await renderPagePng()
     if (!slices.length) return
@@ -1435,7 +1584,7 @@ export default function App() {
       pdf.addImage(slice.png, 'PNG', 0, 0, widthMm, heightMm, undefined, 'FAST')
     })
 
-    pdf.save(`${mode === 'tweet' ? 'tweet' : 'imessage'}-book-page.pdf`)
+    pdf.save((mode === 'tweet' ? 'tweet' : mode === 'notifications' ? 'notifications' : 'imessage') + '-book-page.pdf')
     setStatus(`PDF exported without cropping · ${slices.length} page${slices.length === 1 ? '' : 's'}.`)
   }
 
@@ -1467,7 +1616,7 @@ export default function App() {
     for (let i = 0; i < slices.length; i += 1) {
       const a = document.createElement('a')
       a.href = slices[i].png
-      a.download = `${mode === 'tweet' ? 'tweet' : 'imessage'}-book-page-${String(i + 1).padStart(2, '0')}.png`
+      a.download = (mode === 'tweet' ? 'tweet' : mode === 'notifications' ? 'notifications' : 'imessage') + '-book-page-' + String(i + 1).padStart(2, '0') + '.png'
       a.click()
       await new Promise(resolve => setTimeout(resolve, 120))
     }
@@ -1551,7 +1700,7 @@ export default function App() {
       <header className="topbar">
         <div>
           <div className="eyebrow">CONVERSATION → BOOK</div>
-          <h1>{mode === 'tweet' ? 'Tweet Renderer' : mode === 'imessage' ? 'iMessage Renderer' : 'Conversation Renderer'}</h1>
+          <h1>{mode === 'tweet' ? 'Tweet Renderer' : mode === 'imessage' ? 'iMessage Renderer' : mode === 'notifications' ? 'Lockscreen Notifications' : 'Conversation Renderer'}</h1>
         </div>
         {mode && <div className="top-actions"><button className="ghost" onClick={resetProject}>Change converter</button></div>}
       </header>
@@ -1559,7 +1708,7 @@ export default function App() {
       {screen === 'home' && (
         <main className="home-grid">
           <section className="home-hero">
-            <span className="badge">One site · two converters</span>
+            <span className="badge">One site · three converters</span>
             <h2>Turn social conversations into clean, editable book pages.</h2>
             <p>Paste a formatted iMessage transcript or build the conversation manually. Tweet mode is fully manual so your character library, replies, and quotes stay predictable.</p>
           </section>
@@ -1575,8 +1724,25 @@ export default function App() {
             <p>Manual character library, fast post editor, replies, nested replies, alignment controls and quote posts. No unreliable Tweet OCR.</p>
             <span>Open converter →</span>
           </button>
+          <button className="mode-card notification-mode-card" onClick={() => selectMode('notifications')}>
+            <div className="mode-kicker">03</div>
+            <h3>Lockscreen Notifications → Book</h3>
+            <p>Simple rounded notifications with editable title, count, app, contact, and message. Optional Do Not Disturb footer, ready for book export.</p>
+            <span>Open converter →</span>
+          </button>
           <section className="home-note"><b>Manual Tweet mode.</b><span>Save characters once, then reuse their name and @handle across the whole thread. The editor is designed to be quick enough to use when your brain has left the building.</span></section>
         </main>
+      )}
+
+      {screen === 'notifications' && mode === 'notifications' && (
+        <NotificationEditor
+          pageRef={pageRef}
+          settings={settings}
+          setSettings={setSettings}
+          onExportPng={exportPng}
+          onExportPdf={exportPdf}
+          status={status}
+        />
       )}
 
       {screen === 'upload' && mode === 'imessage' && (
@@ -1769,6 +1935,7 @@ export default function App() {
                             <option value="">Beginning</option>
                             {messages.map((message, index) => <option key={message.id} value={message.id}>Message {index + 1} · {(message.speaker || 'Character')} · {normalizeText(message.text).slice(0, 42) || 'Empty text'}</option>)}
                           </select></label>
+                          <MiddleDndFields item={selectedMiddleText} onUpdate={updateMiddleText} defaultName={imessageCharacters.find(character => character.id === imessageRightCharacterId)?.name || settings.rightSideCharacter || ''} />
                           <button className="danger" onClick={() => deleteMiddleText(selectedMiddleText.id)}>Delete middle text</button>
                         </div>
                       ) : selected ? (
@@ -1808,6 +1975,7 @@ export default function App() {
                           <option value="">Beginning</option>
                           {messages.map((message, index) => <option key={message.id} value={message.id}>Message {index + 1} · {(message.speaker || 'Character')} · {normalizeText(message.text).slice(0, 42) || 'Empty text'}</option>)}
                         </select></label>
+                        <MiddleDndFields item={selectedMiddleText} onUpdate={updateMiddleText} defaultName={imessageCharacters.find(character => character.id === imessageRightCharacterId)?.name || settings.rightSideCharacter || ''} />
                         <button className="danger" onClick={() => deleteMiddleText(selectedMiddleText.id)}>Delete middle text</button>
                       </div>
                     ) : selected ? (
@@ -1844,7 +2012,7 @@ export default function App() {
                           <div key={item.id} className={`quick-middle-row ${item.id === selectedMiddleTextId ? 'active' : ''}`}>
                             <button type="button" className="quick-middle-select" onClick={() => selectMiddleText(item.id)}>
                               <span>{index + 1}</span>
-                              <div><b>{item.text || 'Untitled middle text'}</b><small>{item.afterMessageId ? 'Placed after a message' : 'Placed at the beginning'}</small></div>
+                              <div><b>{item.text || (item.dnd ? '☾ Notifications silenced' : 'Untitled middle text')}</b><small>{item.afterMessageId ? 'Placed after a message' : 'Placed at the beginning'}</small></div>
                             </button>
                             <button type="button" className="mini-danger" title="Delete middle text" onClick={() => deleteMiddleText(item.id)}>×</button>
                           </div>
