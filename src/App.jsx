@@ -1194,12 +1194,14 @@ export default function App() {
 
       const leftName = mapping.leftSpeaker
       const rightName = mapping.rightSpeaker
-      setSettings(prev => ({
-        ...prev,
-        title: (!prev.title || (manualAutoTitle && prev.title === manualAutoTitle)) ? leftName : prev.title,
-        rightSideCharacter: rightName,
-      }))
-      setManualAutoTitle(leftName)
+      if (imessageInputMode === 'paste') {
+        setSettings(prev => ({
+          ...prev,
+          title: (!prev.title || (manualAutoTitle && prev.title === manualAutoTitle)) ? leftName : prev.title,
+          rightSideCharacter: rightName,
+        }))
+        setManualAutoTitle(leftName)
+      }
     } else if (mapping?.kind === 'group') {
       // In group imports, the user can designate one detected speaker as the
       // right-side participant. All other speakers remain left-side gray bubbles.
@@ -1231,6 +1233,16 @@ export default function App() {
         sourceColor: 'gray',
         characterId: '',
       }))
+    }
+
+    if (imessageInputMode === 'manual') {
+      imported = imported.map(message => {
+        const wantedId = message.side === 'right' ? imessageRightCharacterId : imessageLeftCharacterId
+        const character = imessageChatType === 'oneToOne'
+          ? imessageCharacters.find(item => item.id === wantedId)
+          : imessageCharacters.find(item => item.name.trim().toLowerCase() === message.speaker.trim().toLowerCase())
+        return character ? { ...message, speaker: character.name, characterId: character.id } : message
+      })
     }
 
     setMessages(prev => [...prev, ...imported])
@@ -1965,6 +1977,19 @@ export default function App() {
 
             {mode === 'imessage' ? (
               <div className={`workspace ${imessageInputMode === 'manual' ? 'manual-imessage-workspace' : 'paste-workspace'}`}>
+                <details className="paste-editor-panel paste-more-collapsible">
+                  <summary className="compact-details-summary">Paste more conversation <span className="paste-more-hint">Click to expand</span></summary>
+                  <PasteTextPanel
+                    editor
+                    value={pastedText}
+                    onChange={value => { setPastedText(value); setPendingPasteImport(null) }}
+                    onPrepare={preparePastedText}
+                    pendingImport={pendingPasteImport}
+                    onPendingChange={updatePendingPasteImport}
+                    onConfirm={confirmPendingPasteImport}
+                    onCancel={() => setPendingPasteImport(null)}
+                  />
+                </details>
                 {imessageInputMode === 'manual' ? (
                   <ManualIMessageQuickComposer
                     characters={imessageCharacters}
@@ -2018,21 +2043,6 @@ export default function App() {
                 </div>
                 <div className="control-panel imessage-control-panel">
                   <div className="imessage-editor-head"><div><div className="mini-eyebrow">IPHONE-STYLE EDITOR</div><strong>{imessageInputMode === 'manual' ? 'Manual message editor' : 'Pasted message editor'}</strong></div><div className="right-panel-head-actions"><button type="button" className="subtle-danger-button" onClick={startOverCurrent}>Start over</button><span className="editor-live-pill">LIVE</span></div></div>
-                  {imessageInputMode === 'paste' && (
-                    <details className="paste-editor-panel paste-more-collapsible">
-                      <summary className="compact-details-summary">Paste more conversation <span className="paste-more-hint">Click to expand</span></summary>
-                      <PasteTextPanel
-                        editor
-                        value={pastedText}
-                        onChange={value => { setPastedText(value); setPendingPasteImport(null) }}
-                        onPrepare={preparePastedText}
-                        pendingImport={pendingPasteImport}
-                        onPendingChange={updatePendingPasteImport}
-                        onConfirm={confirmPendingPasteImport}
-                        onCancel={() => setPendingPasteImport(null)}
-                      />
-                    </details>
-                  )}
 
                   {imessageInputMode === 'manual' ? (
                     <>
