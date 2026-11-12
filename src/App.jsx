@@ -685,6 +685,69 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
   )
 }
 
+
+function PreviewQuickComposer({
+  inputMode, chatType, characters, leftId, rightId, text, side, speaker, characterId,
+  suggestedSpeaker, speakers, onText, onSide, onSpeaker, onCharacter, onAdd,
+}) {
+  const manual = inputMode === 'manual'
+  const oneToOne = manual && chatType === 'oneToOne'
+  const selectedCharacter = characterId || characters[0]?.id || ''
+  function handleKeyDown(event) {
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent?.isComposing) return
+    event.preventDefault()
+    if (text.trim()) onAdd()
+  }
+
+  return (
+    <div className="preview-quick-composer">
+      <div className="preview-quick-heading">
+        <b>Quick message</b>
+        <span>Editor only · not included in export</span>
+      </div>
+      <div className="preview-quick-options">
+        {oneToOne ? (
+          <div className="preview-speaker-pair" aria-label="Message speaker">
+            <button type="button" className={side === 'left' ? 'selected' : ''} onClick={() => onSide('left')}>
+              Left · {characters.find(c => c.id === leftId)?.name || 'Person 1'}
+            </button>
+            <button type="button" className={side === 'right' ? 'selected' : ''} onClick={() => onSide('right')}>
+              Right · {characters.find(c => c.id === rightId)?.name || 'Person 2'}
+            </button>
+          </div>
+        ) : (
+          <>
+            {manual ? (
+              <label className="preview-quick-speaker">
+                Speaker
+                <select aria-label="Quick message character" value={selectedCharacter} onChange={e => onCharacter(e.target.value)}>
+                  {characters.map(character => <option key={character.id} value={character.id}>{character.name}</option>)}
+                </select>
+              </label>
+            ) : (
+              <label className="preview-quick-speaker">
+                Speaker
+                <input aria-label="Quick message speaker" list="preview-saved-speakers" value={speaker} placeholder={suggestedSpeaker || 'Character'} onChange={e => onSpeaker(e.target.value)} />
+                <datalist id="preview-saved-speakers">
+                  {speakers.map(name => <option key={name} value={name} />)}
+                </datalist>
+              </label>
+            )}
+            <div className="preview-speaker-pair" aria-label="Message bubble side">
+              <button type="button" className={side === 'left' ? 'selected' : ''} onClick={() => onSide('left')}>Left · gray</button>
+              <button type="button" className={side === 'right' ? 'selected' : ''} onClick={() => onSide('right')}>Right · outline</button>
+            </div>
+          </>
+        )}
+      </div>
+      <div className="preview-quick-entry">
+        <textarea rows={2} aria-label="Type a message under the preview" value={text} onChange={e => onText(e.target.value)} onKeyDown={handleKeyDown} placeholder="Type a message here… (Enter to add, Shift+Enter for a new line)" />
+        <button type="button" className="primary" onClick={onAdd} disabled={!text.trim()}>Add message</button>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [mode, setMode] = useState(null)
   const [screen, setScreen] = useState('home')
@@ -721,6 +784,10 @@ export default function App() {
   const [showTweetCharacterLibrary, setShowTweetCharacterLibrary] = useState(false)
   const [selectedMiddleTextId, setSelectedMiddleTextId] = useState(null)
   const [manualAutoTitle, setManualAutoTitle] = useState('')
+  const [previewQuickText, setPreviewQuickText] = useState('')
+  const [previewQuickSide, setPreviewQuickSide] = useState('left')
+  const [previewQuickSpeaker, setPreviewQuickSpeaker] = useState('')
+  const [previewQuickCharacterId, setPreviewQuickCharacterId] = useState('')
   const [settings, setSettings] = useState({
     page: PAGE_SIZES.A5,
     title: '',
@@ -766,6 +833,10 @@ export default function App() {
     setManualDraftMiddleText('')
     setManualComposerMode('new')
     setManualAutoTitle('')
+    setPreviewQuickText('')
+    setPreviewQuickSide('left')
+    setPreviewQuickSpeaker('')
+    setPreviewQuickCharacterId('')
     setSettings(prev => ({ ...prev, title: '' }))
 
     if (nextMode === 'tweet') {
@@ -787,6 +858,38 @@ export default function App() {
 
   function updateTweet(id, patch) {
     setTweets(prev => prev.map(t => t.id === id ? { ...t, ...patch, text: patch.text !== undefined ? String(patch.text) : t.text } : t))
+  }
+
+  function addPreviewQuickMessage() {
+    const text = previewQuickText.replace(/\r\n/g, '\n').trim()
+    if (!text) return
+    const side = previewQuickSide
+    let characterId = ''
+    let speaker = ''
+    if (imessageInputMode === 'manual') {
+      characterId = imessageChatType === 'oneToOne'
+        ? (side === 'left' ? imessageLeftCharacterId : imessageRightCharacterId)
+        : (previewQuickCharacterId || imessageCharacters[0]?.id || '')
+      const character = imessageCharacters.find(c => c.id === characterId)
+      if (!character) {
+        setStatus('Choose a saved character before adding a message.')
+        return
+      }
+      speaker = character.name
+    } else {
+      const recent = [...messages].reverse().find(m => m.side === side)
+      speaker = previewQuickSpeaker.trim() || recent?.speaker || (side === 'right' ? settings.rightSideCharacter : 'Character') || 'Character'
+    }
+    setMessages(prev => [...prev, {
+      id: uid(), speaker, characterId, text,
+      side, sourceColor: side === 'right' ? 'blue' : 'gray',
+    }])
+    setPreviewQuickText('')
+    setPreviewQuickSpeaker(speaker)
+    setSelectedId(null)
+    setSelectedMiddleTextId(null)
+    setManualComposerMode('new')
+    setStatus('Message added beneath the preview.')
   }
 
   function addMessage() {
@@ -1674,6 +1777,10 @@ export default function App() {
     setManualDraftMiddleText('')
     setManualComposerMode('new')
     setManualAutoTitle('')
+    setPreviewQuickText('')
+    setPreviewQuickSide('left')
+    setPreviewQuickSpeaker('')
+    setPreviewQuickCharacterId('')
   }
 
   const currentItems = mode === 'imessage' ? messages : tweets
@@ -1702,7 +1809,15 @@ export default function App() {
           <div className="eyebrow">CONVERSATION → BOOK</div>
           <h1>{mode === 'tweet' ? 'Tweet Renderer' : mode === 'imessage' ? 'iMessage Renderer' : mode === 'notifications' ? 'Lockscreen Notifications' : 'Conversation Renderer'}</h1>
         </div>
-        {mode && <div className="top-actions"><button className="ghost" onClick={resetProject}>Change converter</button></div>}
+        {mode && (
+          <div className="top-actions">
+            <button type="button" className="home-top-button" onClick={resetProject} aria-label="Back to converter home" title="Back to home">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z" />
+              </svg>
+            </button>
+          </div>
+        )}
       </header>
 
       {screen === 'home' && (
@@ -1849,7 +1964,7 @@ export default function App() {
             </div>
 
             {mode === 'imessage' ? (
-              <div className={`workspace ${imessageInputMode === 'manual' ? 'manual-imessage-workspace' : ''}`}>
+              <div className={`workspace ${imessageInputMode === 'manual' ? 'manual-imessage-workspace' : 'paste-workspace'}`}>
                 {imessageInputMode === 'manual' ? (
                   <ManualIMessageQuickComposer
                     characters={imessageCharacters}
@@ -1877,7 +1992,8 @@ export default function App() {
                     onDeleteMiddleText={deleteMiddleText}
                   />
                 ) : (
-                  <div className="paste-editor-panel source-panel">
+                  <details className="paste-editor-panel source-panel">
+                    <summary className="compact-details-summary">Paste more conversation</summary>
                     <PasteTextPanel
                       editor
                       value={pastedText}
@@ -1888,9 +2004,32 @@ export default function App() {
                       onConfirm={confirmPendingPasteImport}
                       onCancel={() => setPendingPasteImport(null)}
                     />
-                  </div>
+                  </details>
                 )}
-                <div className="preview-panel"><div className="panel-heading"><span>Long book preview</span><span>{settings.page.width} mm wide</span></div><div className="pages-stage"><IBookPage messages={manualIMessageDisplayMessages} middleTexts={middleTexts} settings={settings} pageRef={pageRef} preserveManualSpacing={imessageInputMode === 'manual'} /></div></div>
+                <div className="preview-panel">
+                  <div className="panel-heading"><span>Long book preview</span><span>{settings.page.width} mm wide</span></div>
+                  <div className="pages-stage">
+                    <IBookPage messages={manualIMessageDisplayMessages} middleTexts={middleTexts} settings={settings} pageRef={pageRef} preserveManualSpacing={imessageInputMode === 'manual'} />
+                  </div>
+                  <PreviewQuickComposer
+                    inputMode={imessageInputMode}
+                    chatType={imessageChatType}
+                    characters={imessageCharacters}
+                    leftId={imessageLeftCharacterId}
+                    rightId={imessageRightCharacterId}
+                    text={previewQuickText}
+                    side={previewQuickSide}
+                    speaker={previewQuickSpeaker}
+                    characterId={previewQuickCharacterId}
+                    suggestedSpeaker={[...messages].reverse().find(message => message.side === previewQuickSide)?.speaker || (previewQuickSide === 'right' ? settings.rightSideCharacter : 'Character')}
+                    speakers={[...new Set(messages.map(message => message.speaker).filter(Boolean))]}
+                    onText={setPreviewQuickText}
+                    onSide={side => { setPreviewQuickSide(side); setPreviewQuickSpeaker('') }}
+                    onSpeaker={setPreviewQuickSpeaker}
+                    onCharacter={setPreviewQuickCharacterId}
+                    onAdd={addPreviewQuickMessage}
+                  />
+                </div>
                 <div className="control-panel imessage-control-panel">
                   <div className="imessage-editor-head"><div><div className="mini-eyebrow">IPHONE-STYLE EDITOR</div><strong>{imessageInputMode === 'manual' ? 'Manual message editor' : 'Pasted message editor'}</strong></div><div className="right-panel-head-actions"><button type="button" className="subtle-danger-button" onClick={startOverCurrent}>Start over</button><span className="editor-live-pill">LIVE</span></div></div>
 
@@ -2021,8 +2160,8 @@ export default function App() {
                     </>
                   )}
 
-                  <div className="settings-block">
-                    <div className="panel-heading">Book settings</div>
+                  <details className="settings-block settings-collapsible">
+                    <summary className="compact-details-summary">Book settings</summary>
                     <label>Page width<select value={settings.page.label} onChange={e => { const p = Object.values(PAGE_SIZES).find(x => x.label === e.target.value); if (p) setSettings(prev => ({ ...prev, page: p })) }}>{Object.values(PAGE_SIZES).map(p => <option key={p.label}>{p.label}</option>)}</select></label>
                     <div className="setting-note">{settings.imessageExportLayout === 'split' ? `Export will split at message boundaries into ${IMESSAGE_SPLIT_HEIGHT_MM / 10} cm-high pages, keep 5 mm top/bottom margins, and repeat the page title on every page.` : 'Long export keeps the full conversation at the selected width.'}</div>
                     <label>Font<select value={settings.font} onChange={e => setSettings(s => ({ ...s, font: e.target.value }))}><option value="Georgia, serif">Georgia</option><option value="Times New Roman, serif">Times New Roman</option><option value="Arial, sans-serif">Arial</option><option value="Helvetica, Arial, sans-serif">Helvetica</option><option value="Courier New, monospace">Courier New</option></select></label>
@@ -2030,7 +2169,7 @@ export default function App() {
                     <label>Bubble width %<input type="range" min="45" max="70" value={settings.bubbleWidth} onChange={e => setSettings(s => ({ ...s, bubbleWidth: Number(e.target.value) }))} /></label>
                     <label>Page title<input value={settings.title} onChange={e => setSettings(s => ({ ...s, title: e.target.value }))} placeholder="Optional" /></label>
                     <label>Footer<input value={settings.footer} onChange={e => setSettings(s => ({ ...s, footer: e.target.value }))} placeholder="Optional" /></label>
-                  </div>
+                  </details>
                 </div>
               </div>
             ) : (
@@ -2069,15 +2208,15 @@ export default function App() {
                     })}
                   </div>}
 
-                  <div className="tweet-settings-compact">
-                    <div className="mini-eyebrow">BOOK SETTINGS</div>
+                  <details className="tweet-settings-compact settings-collapsible">
+                    <summary className="compact-details-summary">Book settings</summary>
                     <label>Page width<select value={settings.page.label} onChange={e => { const p = Object.values(PAGE_SIZES).find(x => x.label === e.target.value); if (p) setSettings(prev => ({ ...prev, page: p })) }}>{Object.values(PAGE_SIZES).map(p => <option key={p.label}>{p.label}</option>)}</select></label>
                     <label>Font<select value={settings.font} onChange={e => setSettings(s => ({ ...s, font: e.target.value }))}><option value="Georgia, serif">Georgia</option><option value="Times New Roman, serif">Times New Roman</option><option value="Arial, sans-serif">Arial</option><option value="Helvetica, Arial, sans-serif">Helvetica</option><option value="Courier New, monospace">Courier New</option></select></label>
                     <div className="two-col"><label>Text px<input type="number" min="8" max="24" value={settings.fontSize} onChange={e => setSettings(s => ({ ...s, fontSize: Number(e.target.value) || 12 }))} /></label><label>Side margin mm<input type="number" min="8" max="30" value={settings.margin} onChange={e => setSettings(s => ({ ...s, margin: Number(e.target.value) || 16 }))} /></label></div>
                     <label>Card width %<input type="range" min="78" max="100" value={settings.tweetWidth} onChange={e => setSettings(s => ({ ...s, tweetWidth: Number(e.target.value) }))} /></label>
                     <label>Page title<input value={settings.title} onChange={e => setSettings(s => ({ ...s, title: e.target.value }))} placeholder="Optional" /></label>
                     <label>Footer<input value={settings.footer} onChange={e => setSettings(s => ({ ...s, footer: e.target.value }))} placeholder="Optional" /></label>
-                  </div>
+                  </details>
                 </div>
 
                 <div className="preview-panel tweet-preview-panel">
