@@ -1,0 +1,1147 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #121212;
+  background: #eceae5;
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+
+.app-shell { min-height: 100vh; }
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  border-bottom: 1px solid #d6d2ca;
+  background: rgba(250, 249, 247, 0.92);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(16px);
+}
+.eyebrow { font-size: 10px; letter-spacing: .16em; font-weight: 800; color: #77736d; }
+h1 { margin: 4px 0 0; font-family: Georgia, serif; font-size: 25px; }
+.top-actions, .toolbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+button { border: 0; border-radius: 999px; padding: 10px 15px; }
+.ghost { background: #fff; border: 1px solid #cfcac1; }
+.primary { background: #111; color: #fff; }
+.file-button { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.file-button input { display: none; }
+.danger { background: #fff0f0; color: #9a2626; border: 1px solid #e7b4b4; width: 100%; margin-top: 8px; }
+.small-button { padding: 6px 9px; background: #efede8; font-size: 11px; }
+
+.upload-layout {
+  width: min(1120px, calc(100% - 40px));
+  margin: 48px auto;
+  display: grid;
+  grid-template-columns: 1.5fr .85fr;
+  gap: 18px;
+}
+.hero-card, .info-card {
+  background: #faf9f7;
+  border: 1px solid #d5d1c9;
+  border-radius: 28px;
+  box-shadow: 0 20px 55px rgba(0,0,0,.06);
+}
+.hero-card { padding: 38px; }
+.hero-copy h2 { font: 700 44px/1.02 Georgia, serif; margin: 18px 0 14px; max-width: 700px; }
+.hero-copy p { max-width: 680px; color: #5a5752; line-height: 1.6; }
+.badge { display: inline-block; padding: 7px 10px; border-radius: 999px; background: #efede8; color: #4f4b45; font-size: 11px; font-weight: 700; }
+.dropzone {
+  margin-top: 28px;
+  min-height: 220px;
+  border: 1.5px dashed #aaa49b;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  background: #f4f2ee;
+  text-align: center;
+  transition: .2s ease;
+}
+.dropzone:hover { transform: translateY(-2px); background: #f0eee9; }
+.dropzone input { display: none; }
+.drop-icon { font-size: 40px; line-height: 1; }
+.dropzone small, .drop-hint { color: #7b776f; }
+.drop-hint { font-size: 11px; }
+.progress-wrap { margin-top: 18px; color: #68635c; font-size: 12px; }
+.progress-track { height: 7px; border-radius: 999px; overflow: hidden; background: #dedad2; margin-bottom: 8px; }
+.progress-fill { height: 100%; background: #111; border-radius: inherit; transition: width .2s; }
+
+.paste-card { margin-top: 18px; border: 1px solid #ddd8cf; border-radius: 18px; padding: 14px; background: #f3f1ec; }
+.paste-heading { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+.paste-heading b { display: block; font-size: 13px; }
+.paste-heading span { display: block; font-size: 11px; color: #777169; margin-top: 3px; }
+code { background: #e7e3dc; border-radius: 5px; padding: 1px 4px; }
+.paste-card textarea { min-height: 130px; background: #fff; }
+.paste-button { width: 100%; margin-top: 8px; }
+
+.info-card { padding: 28px; }
+.info-card h3 { font: 700 21px Georgia, serif; margin: 0 0 20px; }
+.feature-list { display: grid; gap: 14px; }
+.feature-list div { border-bottom: 1px solid #dfdbd3; padding-bottom: 14px; }
+.feature-list b { display: block; margin-bottom: 4px; }
+.feature-list span { color: #6b665f; font-size: 13px; line-height: 1.45; }
+.tiny-note { color: #868178; font-size: 12px; line-height: 1.5; }
+
+.editor-shell { width: 100%; }
+.editor-main { padding: 22px 22px 10px; }
+.editor-toolbar { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 14px; }
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(220px, .7fr) minmax(420px, 1.2fr) minmax(300px, .8fr);
+  gap: 14px;
+  align-items: start;
+}
+.source-panel, .preview-panel, .control-panel { background: #f8f7f4; border: 1px solid #d5d1c9; border-radius: 18px; overflow: hidden; }
+.panel-heading { display: flex; justify-content: space-between; padding: 12px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: .13em; color: #7b766e; border-bottom: 1px solid #dfdbd3; }
+.source-stack { padding: 12px; display: grid; gap: 18px; }
+.source-item { margin: 0; border: 1px solid #e0dbd2; border-radius: 12px; overflow: hidden; background: #fff; }
+.source-item figcaption { padding: 8px 10px; font-size: 10px; color: #6d6860; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.source-image { display: block; width: 100%; height: auto; }
+.pages-stage { padding: 28px; background: #d9d6d0; overflow: auto; min-height: calc(100vh - 145px); }
+.book-page { margin: 0 auto 28px; background: #fff; box-shadow: 0 14px 35px rgba(0,0,0,.16); position: relative; color: #111; height: auto; min-height: 30mm; overflow: visible; }
+.book-page .page-title {
+  min-height: 10px;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.2;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: .02em;
+}
+.conversation { padding-top: 8mm; display: flex; flex-direction: column; gap: 3.5mm; }
+.book-message.same-speaker { margin-top: -1.7mm; }
+.book-message { display: flex; flex-direction: column; width: 100%; }
+.book-message.left { align-items: flex-start; }
+.book-message.right { align-items: flex-end; }
+.speaker-name { font-size: 9px; font-weight: 700; margin-bottom: 1.5mm; color: #36332f; letter-spacing: .01em; }
+.book-bubble {
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 0;
+  height: auto;
+  padding: 2.8mm 3.8mm;
+  line-height: 1.38;
+  border-radius: 4.8mm;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: normal;
+  hyphens: none;
+  vertical-align: top;
+}
+.book-bubble .manual-message-line { white-space: normal; }
+.book-bubble.gray { background: #e5e5ea; color: #111; }
+.book-bubble.outline { background: #fff; color: #111; border: 1.1px solid #111; }
+.page-footer { margin-top: 8mm; text-align: center; font-size: 8px; color: #99948c; }
+
+.control-panel { max-height: calc(100vh - 150px); overflow: auto; }
+.form-card { padding: 14px; }
+.form-card label, .settings-block label { display: grid; gap: 6px; font-size: 12px; color: #5f5b55; margin-bottom: 12px; }
+input, textarea, select { width: 100%; border: 1px solid #cfcac1; border-radius: 10px; padding: 9px 10px; background: #fff; color: #161616; outline: none; }
+textarea { resize: vertical; line-height: 1.45; }
+input:focus, textarea:focus, select:focus { border-color: #888177; box-shadow: 0 0 0 3px rgba(0,0,0,.05); }
+.add-btn { width: calc(100% - 28px); margin: 0 14px 12px; background: #111; color: #fff; }
+.message-list { display: grid; padding: 0 14px 14px; gap: 7px; }
+.message-row { width: 100%; text-align: left; border-radius: 12px; background: #f0eee9; display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: start; }
+.message-row.active { background: #111; color: #fff; }
+.message-row span { font-size: 10px; opacity: .65; padding-top: 2px; }
+.message-row b { display: block; font-size: 12px; }
+.message-row small { display: block; font-size: 10px; opacity: .72; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 235px; margin-top: 3px; }
+.settings-block { border-top: 1px solid #dfdbd3; padding-bottom: 10px; }
+.settings-block .panel-heading { margin-bottom: 12px; }
+.settings-block label { padding: 0 14px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px; }
+.two-col label { padding: 0; }
+.empty-state { padding: 24px 14px; color: #8b867f; font-size: 13px; }
+.bottom-status { position: fixed; left: 22px; bottom: 18px; background: #fff; border: 1px solid #ccc7be; border-radius: 999px; padding: 7px 12px; box-shadow: 0 10px 20px rgba(0,0,0,.08); display: flex; gap: 10px; align-items: center; z-index: 50; }
+.bottom-status .progress-track { width: 120px; margin: 0; }
+
+@media (max-width: 1100px) {
+  .workspace { grid-template-columns: 260px minmax(420px, 1fr); }
+  .control-panel { grid-column: 1 / -1; max-height: none; }
+}
+
+@media (max-width: 760px) {
+  .topbar { padding: 18px; align-items: flex-start; flex-direction: column; }
+  .upload-layout { grid-template-columns: 1fr; width: calc(100% - 20px); margin: 20px auto; }
+  .hero-card { padding: 24px; }
+  .hero-copy h2 { font-size: 34px; }
+  .editor-main { padding: 12px; }
+  .editor-toolbar { align-items: flex-start; flex-direction: column; }
+  .workspace { grid-template-columns: 1fr; }
+  .source-panel { order: 2; }
+  .preview-panel { order: 1; }
+  .control-panel { order: 3; }
+  .pages-stage { min-height: auto; padding: 16px; }
+}
+
+.setting-note { margin: -4px 14px 12px; color: #8a857d; font-size: 10px; line-height: 1.45; }
+.manual-note { margin: -4px 0 12px; padding: 0 14px; color: #8a857d; font-size: 10px; line-height: 1.45; }
+
+/* v1.6 converter chooser + tweet mode */
+.home-grid {
+  width: min(1120px, calc(100% - 40px));
+  margin: 48px auto;
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 18px;
+}
+.home-hero, .mode-card, .home-note {
+  border: 1px solid #d5d1c9;
+  border-radius: 28px;
+  background: #faf9f7;
+  box-shadow: 0 20px 55px rgba(0,0,0,.06);
+}
+.home-hero { padding: 38px; grid-column: 1 / -1; }
+.home-hero h2 { font: 700 48px/1.02 Georgia, serif; max-width: 760px; margin: 18px 0 14px; }
+.home-hero p { max-width: 760px; color: #5a5752; line-height: 1.6; }
+.mode-card { padding: 28px; text-align: left; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+.mode-card:hover { transform: translateY(-3px); box-shadow: 0 24px 60px rgba(0,0,0,.09); background: #fff; }
+.mode-kicker { color: #8d877e; letter-spacing: .16em; font-size: 10px; font-weight: 800; }
+.mode-card h3 { font: 700 28px Georgia, serif; margin: 14px 0 10px; }
+.mode-card p { color: #67625b; line-height: 1.55; min-height: 88px; }
+.mode-card span { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 800; }
+.home-note { grid-column: 1 / -1; padding: 16px 18px; display: flex; gap: 10px; align-items: center; font-size: 12px; color: #666158; }
+.home-note b { color: #151515; white-space: nowrap; }
+.tweet-page .page-title { text-align: center; font-size: 17px; line-height: 1.2; font-weight: 800; font-style: italic; }
+.tweet-conversation { padding-top: 4mm; display: flex; flex-direction: column; gap: 4mm; align-items: flex-start; }
+.tweet-card { width: 100%; border: 1.1px solid #111; border-radius: 4.5mm; padding: 3.5mm 4mm; background: #fff; overflow-wrap: anywhere; }
+.tweet-name { font-weight: 700; font-size: 12px; line-height: 1.15; }
+.tweet-handle { font-size: 9px; margin-top: 1.2mm; color: #555; }
+.tweet-text { margin-top: 3.2mm; line-height: 1.4; white-space: normal; }
+.tweet-reply { margin-top: 3mm; padding-top: 2.5mm; border-top: 1px solid #ddd; font-size: 9px; color: #555; }
+@media (max-width: 760px) {
+  .home-grid { grid-template-columns: 1fr; width: calc(100% - 20px); margin: 20px auto; }
+  .home-hero h2 { font-size: 36px; }
+  .home-note { flex-direction: column; align-items: flex-start; }
+}
+
+/* v1.7 tweet thread hierarchy */
+.tweet-card {
+  transition: max-width .15s ease, margin-left .15s ease;
+}
+.tweet-level-reply {
+  border-radius: 4mm;
+  padding: 3mm 3.5mm;
+}
+.tweet-level-nested-reply {
+  border-radius: 3.5mm;
+  padding: 2.8mm 3.2mm;
+}
+.tweet-level-reply .tweet-name,
+.tweet-level-nested-reply .tweet-name {
+  font-size: 11px;
+}
+.tweet-level-reply .tweet-handle,
+.tweet-level-nested-reply .tweet-handle {
+  font-size: 8.5px;
+}
+.tweet-level-reply .tweet-text,
+.tweet-level-nested-reply .tweet-text {
+  margin-top: 2.6mm;
+}
+
+/* v1.8 tweet hierarchy + structural reply controls */
+.tweet-conversation { gap: 3.2mm; }
+.tweet-card { box-sizing: border-box; }
+.tweet-level-0 { padding: 3.8mm 4.2mm; }
+.tweet-level-1 { padding: 3.1mm 3.6mm; border-radius: 4mm; }
+.tweet-level-2 { padding: 2.7mm 3.2mm; border-radius: 3.6mm; }
+.tweet-level-1 .tweet-name, .tweet-level-2 .tweet-name { font-size: 11px; }
+.tweet-level-1 .tweet-handle, .tweet-level-2 .tweet-handle { font-size: 8.5px; }
+.tweet-generated-reply { margin-top: 1.8mm; font-size: 8.5px; color: #66615a; }
+.tweet-level-2 .tweet-generated-reply { font-size: 8px; }
+.tweet-level-1 .tweet-text { margin-top: 2.6mm; }
+.tweet-level-2 .tweet-text { margin-top: 2.3mm; }
+.tweet-card.reply-align-right { align-self: flex-end; }
+.tweet-card.reply-align-left { align-self: flex-start; }
+
+.thread-parent-hint {
+  padding: 8px 10px;
+  border: 1px solid #e1ddd5;
+  border-radius: 10px;
+  background: #f6f4ef;
+  color: #777169;
+  font-size: 10px;
+  line-height: 1.45;
+  margin: -4px 0 10px;
+}
+
+/* v1.9 manual Tweet mode: compact iPhone-bubble UI */
+.tweet-workspace { display: grid; grid-template-columns: minmax(300px, 360px) minmax(520px, 1fr); gap: 14px; align-items: start; }
+.tweet-editor-sidebar { background: rgba(248,247,244,.92); border: 1px solid #d5d1c9; border-radius: 24px; padding: 12px; box-shadow: 0 16px 45px rgba(0,0,0,.06); position: sticky; top: 92px; max-height: calc(100vh - 114px); overflow: auto; }
+.character-manager { border-radius: 19px; background: linear-gradient(180deg,#f8f7f4,#efede8); border: 1px solid #ddd8cf; padding: 10px; margin-bottom: 10px; }
+.character-manager-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+.mini-eyebrow { font-size: 9px; letter-spacing:.14em; font-weight:800; color:#8b857d; }
+.character-list-vertical { display:grid; gap:7px; }
+.character-pill { display:grid; gap:7px; background:#fff; border:1px solid #d9d4ca; border-radius:14px; padding:8px; box-shadow:0 4px 12px rgba(0,0,0,.04); }
+.character-pill-main { display:grid; grid-template-columns:1fr; gap:5px; }
+.character-pill input { width:100%; padding:7px 8px; border-radius:10px; border:1px solid #e0dbd3; background:#faf9f7; font-size:10px; }
+.character-pill-actions { display:grid; grid-template-columns:1fr 32px; gap:6px; }
+.character-use { border-radius:10px; padding:7px 9px; background:#111; color:#fff; font-size:10px; font-weight:700; }
+.mini-danger { width:32px; padding:0; background:#f7ecec; border:1px solid #ecc8c8; color:#8e2e2e; font-weight:700; border-radius:10px; }
+.character-add-button { width:100%; margin-top:7px; border-radius:12px; background:#efede8; border:1px solid #d8d3ca; color:#111; padding:9px 12px; font-size:10px; font-weight:800; }
+.compact-composer { border-radius:20px; background:#fff; border:1px solid #ded9d0; padding:11px; box-shadow:0 8px 28px rgba(0,0,0,.05); }
+.composer-disabled { opacity:.72; }
+.composer-empty { margin:-2px 0 10px; padding:8px 9px; border-radius:11px; background:#f5f3ef; color:#78736b; font-size:9px; }
+.compact-composer select:disabled, .compact-composer textarea:disabled, .compact-composer button:disabled { cursor:not-allowed; opacity:.65; }
+
+.composer-topline { display:flex; align-items:center; gap:7px; font-size:12px; margin-bottom:9px; }
+.composer-dot { width:8px; height:8px; border-radius:50%; background:#111; display:inline-block; }
+.composer-hint { margin-left:auto; font-size:9px; color:#918b83; }
+.compact-field { display:grid; gap:5px; font-size:10px; color:#6c675f; margin-bottom:8px; }
+.compact-field select, .compact-field textarea { border-radius:12px; border:1px solid #d7d2c9; padding:8px 9px; background:#fbfaf8; font-size:11px; }
+.compact-field textarea { resize:vertical; line-height:1.4; }
+.segmented-control { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin:7px 0 9px; padding:4px; border-radius:13px; background:#f0eee9; border:1px solid #ded9d1; }
+.segmented-control button { padding:7px 5px; border-radius:9px; background:transparent; font-size:9px; color:#656059; }
+.segmented-control button.selected { background:#111; color:#fff; box-shadow:0 2px 5px rgba(0,0,0,.14); }
+.alignment-row { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:10px; color:#6a655e; margin:4px 0 8px; }
+.alignment-control { width:145px; grid-template-columns:1fr 1fr; margin:0; }
+.selected-reference { margin-top:3px; padding:8px 9px; border-radius:11px; background:#f5f3ef; color:#6c665e; font-size:9px; }
+.delete-post-pill { width:100%; margin-top:8px; padding:9px 12px; border-radius:13px; background:#fff2f2; color:#8f2e2e; border:1px solid #ecc4c4; font-size:10px; }
+.tweet-add-inline { width:100%; margin:8px 0 10px; padding:10px 12px; border-radius:13px; background:#111; color:#fff; font-size:11px; font-weight:700; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+
+.tweet-list-mini { display:grid; gap:5px; margin-top:10px; }
+.tweet-list-item { display:grid; grid-template-columns:22px 1fr; gap:7px; align-items:start; text-align:left; width:100%; padding:8px 9px; border-radius:12px; background:#eeece7; }
+.tweet-list-item.active { background:#111; color:#fff; }
+.tweet-list-item > span { font-size:9px; opacity:.55; padding-top:1px; }
+.tweet-list-item b { display:block; font-size:10px; }
+.tweet-list-item small { display:block; margin-top:2px; font-size:9px; opacity:.67; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tweet-settings-compact { margin-top:10px; padding-top:10px; border-top:1px solid #dfdbd3; }
+.tweet-settings-compact label { display:grid; gap:5px; font-size:9px; color:#6b665e; margin:8px 0; }
+.tweet-settings-compact input, .tweet-settings-compact select { padding:7px 8px; border-radius:10px; font-size:10px; }
+.tweet-settings-compact .two-col { padding:0; gap:7px; }
+.tweet-settings-compact .two-col label { margin:0; }
+.tweet-preview-panel { min-width:0; }
+.tweet-page-v2 .page-title { text-align:center; font-size:17px; line-height:1.2; font-weight:800; font-style:italic; }
+.tweet-conversation-v2 { padding-top:5mm; display:flex; flex-direction:column; gap:4.2mm; align-items:flex-start; }
+.tweet-track { width:100%; display:flex; flex-direction:column; align-items:flex-start; }
+.tweet-card-v2 { border:1.05px solid #111; border-radius:4.5mm; padding:3.5mm 4mm; background:#fff; overflow-wrap:anywhere; box-sizing:border-box; }
+.tweet-level-1 { padding:3.1mm 3.6mm; border-radius:4mm; }
+.tweet-level-2 { padding:2.7mm 3.2mm; border-radius:3.6mm; }
+.tweet-card-v2.reply-align-right { align-self:flex-end; }
+.tweet-card-v2.reply-align-left { align-self:flex-start; }
+.tweet-name-v2 { font-weight:800; font-size:12px; line-height:1.15; }
+.tweet-handle-v2 { margin-top:1.1mm; font-size:9px; color:#5d5851; }
+.tweet-text-v2 { margin-top:3.1mm; line-height:1.42; white-space:normal; }
+.tweet-level-1 .tweet-name-v2, .tweet-level-2 .tweet-name-v2 { font-size:11px; }
+.tweet-level-1 .tweet-handle-v2, .tweet-level-2 .tweet-handle-v2 { font-size:8.5px; }
+.tweet-level-1 .tweet-text-v2 { margin-top:2.6mm; }
+.tweet-level-2 .tweet-text-v2 { margin-top:2.3mm; }
+.tweet-reply-line { margin-top:2.2mm; font-size:8.5px; color:#6d6860; }
+.tweet-level-2 .tweet-reply-line { font-size:8px; }
+.tweet-is-quote { border-radius:4.5mm; }
+.quote-box { margin-top:3.1mm; padding:3mm 3.3mm; border:1px solid #858078; border-radius:3.3mm; background:#fff; }
+.quote-name { font-weight:750; font-size:10px; }
+.quote-handle { font-size:8px; color:#6a655e; margin-top:1mm; }
+.quote-text { margin-top:2mm; line-height:1.38; }
+.floating-add { position:fixed; right:24px; bottom:20px; z-index:45; background:#111; color:#fff; border-radius:999px; padding:12px 16px; box-shadow:0 12px 28px rgba(0,0,0,.18); font-weight:700; }
+@media (max-width:1100px) {
+  .tweet-workspace { grid-template-columns: 300px minmax(420px,1fr); }
+}
+@media (max-width:760px) {
+  .tweet-workspace { grid-template-columns:1fr; }
+  .tweet-editor-sidebar { position:relative; top:auto; max-height:none; }
+  .character-scroll { flex-wrap:wrap; }
+  .floating-add { right:14px; bottom:14px; }
+  .character-pill-main { grid-template-columns:1fr; }
+}
+
+/* v2.1: exact parent-edge alignment for Tweet replies */
+.tweet-card-v2.reply-align-left,
+.tweet-card-v2.reply-align-right {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.tweet-card-v2.reply-align-left { align-self: flex-start; }
+.tweet-card-v2.reply-align-right { align-self: flex-end; }
+
+/* v2.1: iMessage editor gets the same compact iPhone-like polish as Tweet mode */
+.imessage-control-panel {
+  background: rgba(248,247,244,.94);
+  border: 1px solid #d5d1c9;
+  border-radius: 24px;
+  padding: 12px;
+  box-shadow: 0 16px 45px rgba(0,0,0,.06);
+  position: sticky;
+  top: 92px;
+  max-height: calc(100vh - 114px);
+  overflow: auto;
+}
+.imessage-editor-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding: 4px 4px 10px;
+  border-bottom: 1px solid #e1ddd5;
+  margin-bottom: 10px;
+}
+.imessage-editor-head strong { font-size: 14px; }
+.editor-live-pill {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+}
+.imessage-form-card {
+  background: #fff;
+  border: 1px solid #ded9d0;
+  border-radius: 19px;
+  padding: 11px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.05);
+}
+.imessage-control-panel .form-card label {
+  display:grid;
+  gap:5px;
+  font-size:10px;
+  color:#6c675f;
+  margin-bottom:9px;
+}
+.imessage-control-panel .form-card input,
+.imessage-control-panel .form-card textarea {
+  border-radius:12px;
+  border:1px solid #d7d2c9;
+  padding:8px 9px;
+  background:#fbfaf8;
+  font-size:11px;
+}
+.imessage-control-panel .form-card textarea { line-height:1.45; }
+.imessage-side-field { margin-bottom: 9px; }
+.imessage-side-field > span {
+  display:block;
+  font-size:10px;
+  color:#6c675f;
+  margin-bottom:5px;
+}
+.imessage-side-segmented {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  padding:4px;
+  border-radius:13px;
+  background:#f0eee9;
+  border:1px solid #ded9d1;
+}
+.imessage-side-segmented button {
+  padding:7px 6px;
+  border-radius:9px;
+  background:transparent;
+  font-size:9px;
+  color:#656059;
+}
+.imessage-side-segmented button.selected {
+  background:#d8d8dd;
+  color:#111;
+  box-shadow:0 2px 5px rgba(0,0,0,.10);
+}
+.imessage-side-segmented button.selected.right {
+  background:#111;
+  color:#fff;
+}
+.imessage-control-panel .danger {
+  width:100%;
+  margin-top:3px;
+  padding:9px 11px;
+  border-radius:12px;
+  font-size:10px;
+}
+.imessage-control-panel .add-btn {
+  width:100%;
+  margin:9px 0;
+  padding:10px 12px;
+  border-radius:13px;
+  font-size:10px;
+  font-weight:800;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+.imessage-message-list {
+  gap:5px;
+  padding: 0 0 4px;
+}
+.imessage-message-list .message-row {
+  border-radius:13px;
+  padding:8px 9px;
+  border:1px solid transparent;
+}
+.imessage-message-list .message-row.active {
+  border-color:#111;
+}
+.imessage-message-list .message-row small {
+  max-width: 100%;
+}
+.imessage-control-panel .settings-block {
+  margin-top:8px;
+  padding:10px 0 3px;
+  border-top:1px solid #e1ddd5;
+}
+.imessage-control-panel .settings-block .panel-heading {
+  border-bottom:0;
+  padding:0 4px 4px;
+  margin-bottom:7px;
+  letter-spacing:.12em;
+}
+.imessage-control-panel .settings-block label {
+  display:grid;
+  gap:5px;
+  font-size:10px;
+  color:#6c675f;
+  padding:0;
+  margin:8px 4px;
+}
+.imessage-control-panel .settings-block input,
+.imessage-control-panel .settings-block select {
+  padding:8px 9px;
+  border-radius:11px;
+  font-size:10px;
+  background:#fbfaf8;
+}
+.imessage-control-panel .settings-block .two-col {
+  padding:0 4px;
+  gap:7px;
+}
+.imessage-control-panel .setting-note {
+  margin:-2px 4px 6px;
+  padding:7px 8px;
+  border-radius:10px;
+  background:#f5f3ef;
+  color:#817b73;
+  font-size:9px;
+}
+@media (max-width: 1100px) {
+  .imessage-control-panel {
+    position:relative;
+    top:auto;
+    max-height:none;
+  }
+}
+
+/* v2.3: X-style public/private character accounts */
+.privacy-field { display:grid; gap:4px; margin-top:1px; }
+.privacy-label { font-size:8px; font-weight:700; color:#8a847c; letter-spacing:.08em; text-transform:uppercase; }
+.privacy-toggle { display:grid; grid-template-columns:1fr 1fr; gap:3px; padding:3px; border-radius:10px; background:#f0eee9; border:1px solid #ded9d1; }
+.privacy-toggle button { padding:6px 7px; border-radius:8px; background:transparent; color:#6b665e; font-size:9px; font-weight:700; }
+.privacy-toggle button.selected { background:#fff; color:#111; box-shadow:0 2px 5px rgba(0,0,0,.08); }
+.privacy-toggle button.selected.private { background:#111; color:#fff; }
+.tweet-name-line, .quote-name-line { display:flex; align-items:center; gap:4px; min-width:0; }
+.tweet-name-line .tweet-name-v2, .quote-name-line .quote-name { min-width:0; overflow-wrap:anywhere; }
+.private-lock { color:#111; flex:0 0 auto; display:block; }
+
+/* v2.4 additive manual iMessage builder */
+.converter-mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 5px;
+  margin: 24px 0 18px;
+  background: #efede8;
+  border: 1px solid #ddd8cf;
+  border-radius: 15px;
+}
+.converter-mode-switch button {
+  padding: 10px 12px;
+  border-radius: 11px;
+  background: transparent;
+  color: #68635c;
+  font-size: 11px;
+  font-weight: 800;
+}
+.converter-mode-switch button.selected {
+  background: #111;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(0,0,0,.14);
+}
+.manual-imessage-setup {
+  background: linear-gradient(180deg, #f8f7f4, #f0eee9);
+  border: 1px solid #ded9d0;
+  border-radius: 21px;
+  padding: 14px;
+  box-shadow: 0 8px 26px rgba(0,0,0,.04);
+}
+.setup-section-title {
+  margin: 10px 0 7px;
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 900;
+  color: #8a847b;
+}
+.manual-chat-type {
+  grid-template-columns: 1fr 1fr;
+  margin: 0 0 11px;
+}
+.manual-chat-type button { font-size: 10px; }
+.imessage-character-library {
+  display: grid;
+  gap: 7px;
+}
+.imessage-character-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 6px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d9d4ca;
+  border-radius: 13px;
+  padding: 7px;
+}
+.imessage-character-row input {
+  padding: 7px 8px;
+  border-radius: 10px;
+  border: 1px solid #e0dbd3;
+  background: #faf9f7;
+  font-size: 10px;
+}
+.imessage-character-row .mini-danger {
+  height: 31px;
+}
+.one-to-one-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.one-to-one-pair label {
+  display: grid;
+  gap: 5px;
+  font-size: 9px;
+  color: #6b665e;
+}
+.one-to-one-pair select {
+  padding: 8px 9px;
+  border-radius: 11px;
+  font-size: 10px;
+}
+.manual-start-button {
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 13px;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.manual-participants-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin: 10px 12px 0;
+}
+.manual-participants-card > div {
+  display: grid;
+  gap: 3px;
+  padding: 8px 9px;
+  border-radius: 12px;
+  background: #f4f2ed;
+  border: 1px solid #e0dbd3;
+}
+.manual-participants-card span {
+  font-size: 8px;
+  letter-spacing: .12em;
+  font-weight: 900;
+  color: #8a847c;
+}
+.manual-participants-card b {
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.manual-selected-character {
+  margin: -1px 0 10px;
+  padding: 8px 9px;
+  border-radius: 11px;
+  background: #f5f3ef;
+  color: #6c665e;
+  font-size: 10px;
+}
+.manual-note.compact { margin: 8px 12px 0; padding: 8px 9px; background: #f5f3ef; border-radius: 10px; }
+.message-row-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 50px;
+  gap: 5px;
+  align-items: stretch;
+}
+.message-row-shell .message-row {
+  min-width: 0;
+  margin: 0;
+}
+.message-order-buttons {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+}
+.message-order-buttons button {
+  min-width: 0;
+  padding: 0;
+  border-radius: 9px;
+  background: #efede8;
+  border: 1px solid #ddd8cf;
+  color: #55514b;
+  font-size: 11px;
+  font-weight: 900;
+}
+.message-order-buttons button:hover:not(:disabled) { background: #e7e3dc; }
+.message-order-buttons button:disabled { opacity: .35; cursor: not-allowed; }
+@media (max-width: 760px) {
+  .one-to-one-pair, .manual-participants-card { grid-template-columns: 1fr; }
+  .message-row-shell { grid-template-columns: minmax(0, 1fr) 44px; }
+}
+
+
+/* v2.5 manual iMessage usability + split export */
+.imessage-inline-character-manager {
+  margin: 10px 12px 8px;
+  border: 1px solid #dfdad2;
+  border-radius: 14px;
+  background: #f7f5f1;
+  overflow: hidden;
+}
+.imessage-inline-character-manager summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 9px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #4d4943;
+}
+.imessage-inline-character-manager summary::-webkit-details-marker { display:none; }
+.imessage-inline-character-manager summary::after { content:'⌄'; float:right; color:#8a847b; }
+.imessage-inline-character-manager[open] summary::after { content:'⌃'; }
+.inline-character-list { display:grid; gap:6px; padding:0 7px 7px; }
+.inline-character-row { display:grid; grid-template-columns:minmax(0,1fr) 32px; gap:6px; align-items:center; }
+.inline-character-row input { width:100%; padding:7px 8px; border:1px solid #ded9d1; border-radius:10px; background:#fff; font-size:10px; }
+.imessage-inline-character-manager .character-add-button { margin:0 7px 7px; width:calc(100% - 14px); }
+.manual-participants-card.editable { grid-template-columns:1fr 1fr; }
+.manual-participants-card.editable label { display:grid; gap:4px; min-width:0; padding:8px 9px; border-radius:12px; background:#f4f2ed; border:1px solid #e0dbd3; }
+.manual-participants-card.editable span { font-size:8px; letter-spacing:.12em; font-weight:900; color:#8a847c; }
+.manual-participants-card.editable select { width:100%; padding:7px 8px; border-radius:9px; font-size:10px; border:1px solid #d7d2c9; background:#fff; }
+.export-mode-control { display:grid; grid-template-columns:auto 1fr 1fr; align-items:center; gap:3px; padding:3px; border-radius:11px; background:#efede8; border:1px solid #ddd8cf; }
+.export-mode-control span { padding:0 5px; font-size:9px; color:#777169; font-weight:800; }
+.export-mode-control button { padding:7px 8px; border-radius:8px; background:transparent; color:#625d56; font-size:9px; white-space:nowrap; }
+.export-mode-control button.selected { background:#111; color:#fff; box-shadow:0 2px 6px rgba(0,0,0,.12); }
+.export-page .page-title { text-align:center; font-size:17px; line-height:1.2; font-weight:800; font-style:italic; letter-spacing:.02em; }
+.export-page .conversation { padding-top:6mm; }
+.export-page .export-footer { position:absolute; left:0; right:0; bottom:8mm; margin:0; }
+@media (max-width: 760px) {
+  .manual-participants-card.editable { grid-template-columns:1fr; }
+  .export-mode-control { width:100%; grid-template-columns:auto 1fr 1fr; }
+}
+
+/* v2.6 manual iMessage quick-add workspace */
+.manual-imessage-workspace .manual-compose-panel {
+  background: rgba(248,247,244,.92);
+  border: 1px solid #d5d1c9;
+  border-radius: 22px;
+  padding: 12px;
+  box-shadow: 0 16px 45px rgba(0,0,0,.06);
+  position: sticky;
+  top: 92px;
+  max-height: calc(100vh - 114px);
+  overflow: auto;
+}
+.manual-compose-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 2px 10px;
+}
+.manual-compose-head strong { font-size: 12px; }
+.quick-side-field { margin-top: 1px; }
+.typing-hint {
+  font-size: 8.5px;
+  color: #8a847c;
+  line-height: 1.35;
+}
+.manual-quick-add-button {
+  width: 100%;
+  margin-top: 1px;
+  border-radius: 13px;
+  padding: 10px 12px;
+  font-size: 10px;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+.manual-quick-add-button:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+.quick-message-list {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid #dfdbd3;
+}
+.quick-list-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  font-size: 9px;
+  color: #777169;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+}
+.quick-list-label b {
+  min-width: 18px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #efede8;
+  color: #4d4943;
+  text-align: center;
+  font-size: 8px;
+}
+.quick-message-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  gap: 5px;
+  align-items: stretch;
+  margin-bottom: 6px;
+}
+.quick-message-select {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 20px minmax(0,1fr);
+  gap: 7px;
+  align-items: start;
+  padding: 8px 9px;
+  border-radius: 12px;
+  background: #eeece7;
+  text-align: left;
+  color: #171717;
+  border: 1px solid transparent;
+}
+.quick-message-row.active .quick-message-select {
+  background: #111;
+  color: #fff;
+}
+.quick-message-select > span {
+  font-size: 8px;
+  opacity: .55;
+  padding-top: 1px;
+}
+.quick-message-select b {
+  display: block;
+  font-size: 9.5px;
+  line-height: 1.2;
+}
+.quick-message-select small {
+  display: block;
+  margin-top: 3px;
+  font-size: 8.5px;
+  line-height: 1.3;
+  opacity: .7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.quick-message-order {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.quick-message-order button {
+  min-width: 0;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid #d8d3ca;
+  background: #f8f7f4;
+  color: #57524b;
+  font-weight: 800;
+  font-size: 11px;
+}
+.quick-message-order button:disabled {
+  opacity: .32;
+  cursor: not-allowed;
+}
+.quick-empty {
+  padding: 12px 10px;
+  border-radius: 12px;
+  background: #f2f0eb;
+  color: #8b857d;
+  font-size: 9px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .manual-imessage-workspace .manual-compose-panel {
+    position: relative;
+    top: auto;
+    max-height: none;
+  }
+}
+
+/* v2.8.1: 1-on-1 manual iMessage quick speaker buttons */
+.one-to-one-draft-field > span {
+  display: block;
+  font-size: 10px;
+  color: #6c675f;
+  margin-bottom: 5px;
+}
+.one-to-one-character-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 4px;
+  border-radius: 13px;
+  background: #f0eee9;
+  border: 1px solid #ded9d1;
+}
+.one-to-one-character-button {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  text-align: left;
+  padding: 8px 9px;
+  border-radius: 10px;
+  background: transparent;
+  color: #4f4b45;
+  border: 1px solid transparent;
+}
+.one-to-one-character-button:hover:not(:disabled) { background: #e7e4dd; }
+.one-to-one-character-button.selected.left-choice {
+  background: #d8d8dd;
+  color: #111;
+  border-color: #c5c5ca;
+  box-shadow: 0 2px 5px rgba(0,0,0,.08);
+}
+.one-to-one-character-button.selected.right-choice {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  box-shadow: 0 2px 5px rgba(0,0,0,.14);
+}
+.one-to-one-character-button:disabled { opacity: .45; cursor: not-allowed; }
+.one-to-one-choice-side {
+  font-size: 7px;
+  letter-spacing: .12em;
+  font-weight: 900;
+  opacity: .65;
+}
+.one-to-one-character-button b {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .one-to-one-character-buttons { grid-template-columns: 1fr; }
+}
+
+/* v2.8.2: quick composer edit/save controls */
+.manual-compose-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 2px; }
+.secondary-quick-button { width: 100%; border-radius: 13px; padding: 10px 12px; background: #f1efeb; color: #111; border: 1px solid #d9d4cc; font-size: 10px; font-weight: 800; }
+.delete-quick-button { grid-column: 1 / -1; width: 100%; border-radius: 13px; padding: 9px 12px; background: #fff0f0; color: #9a2626; border: 1px solid #e6b9b9; font-size: 10px; font-weight: 800; }
+.delete-quick-button:disabled { opacity: .42; cursor: not-allowed; }
+@media (max-width: 760px) {
+  .manual-compose-actions { grid-template-columns: 1fr; }
+}
+
+/* v2.8.9: export render targets use the real preview geometry without editor shadow. */
+.export-render-target { box-shadow: none !important; }
+
+/* v2.8.11 additive controls: collapsible Tweet list, reset actions, centered iMessage middle text */
+.right-panel-head-actions,
+.preview-head-actions {
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.subtle-danger-button {
+  border:1px solid #e5c6c6;
+  background:#fff5f5;
+  color:#8e3333;
+  border-radius:999px;
+  padding:6px 9px;
+  font-size:8px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.subtle-danger-button:hover { background:#ffefef; }
+.message-middle-text {
+  width:100%;
+  text-align:center;
+  font-size:8.5px;
+  line-height:1.25;
+  color:#7b766e;
+  margin:0 0 1.8mm;
+  letter-spacing:.01em;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.optional-label {
+  font-size:8px;
+  color:#989189;
+  font-weight:400;
+  margin-left:3px;
+}
+.tweet-list-toggle {
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  align-items:center;
+  gap:7px;
+  text-align:left;
+  padding:8px 9px;
+  margin-top:9px;
+  border-radius:12px;
+  background:#f1efe9;
+  border:1px solid #ddd8cf;
+  color:#4d4943;
+  font-size:9px;
+  font-weight:800;
+}
+.tweet-list-toggle:hover { background:#ece9e2; }
+.toggle-count {
+  min-width:18px;
+  padding:3px 6px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid #ded9d1;
+  text-align:center;
+  font-size:8px;
+  color:#777169;
+}
+.toggle-chevron { font-size:12px; line-height:1; color:#817b73; }
+.preview-head-actions > span { white-space:nowrap; }
+
+/* Keep the iMessage center label centered across the conversation, not inside a bubble. */
+.book-message .message-middle-text { align-self:stretch; }
+
+@media (max-width: 760px) {
+  .right-panel-head-actions,
+  .preview-head-actions { gap:4px; }
+  .subtle-danger-button { padding:5px 7px; }
+}
+
+/* v2.8.12 additive UX: collapsible Tweet character library + standalone iMessage middle text */
+.tweet-character-toggle {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:6px 8px;
+  border-radius:10px;
+  background:#efede8;
+  border:1px solid #ddd8cf;
+  color:#5f5a53;
+  font-size:8.5px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.tweet-character-toggle:hover { background:#e9e6df; }
+.tweet-character-toggle > span:nth-child(2) {
+  min-width:16px;
+  padding:2px 5px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid #ded9d1;
+  text-align:center;
+  font-size:7.5px;
+  color:#777169;
+}
+.tweet-character-toggle > span:last-child { font-size:11px; line-height:1; color:#817b73; }
+
+.middle-text-add-button {
+  width:100%;
+  margin:9px 0 0;
+  padding:9px 12px;
+  border-radius:13px;
+  background:#f1efe9;
+  color:#111;
+  border:1px solid #d9d4cc;
+  font-size:10px;
+  font-weight:800;
+}
+.middle-text-add-button:hover { background:#ebe8e1; }
+.quick-middle-list {
+  display:grid;
+  gap:5px;
+  margin-top:9px;
+}
+.quick-middle-row {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 32px;
+  gap:6px;
+  align-items:center;
+}
+.quick-middle-select {
+  display:grid;
+  grid-template-columns:22px minmax(0,1fr);
+  gap:7px;
+  width:100%;
+  text-align:left;
+  padding:8px 9px;
+  border-radius:12px;
+  background:#eeece7;
+  border:1px solid transparent;
+}
+.quick-middle-row.active .quick-middle-select {
+  background:#111;
+  color:#fff;
+}
+.quick-middle-select > span { font-size:9px; opacity:.55; padding-top:1px; }
+.quick-middle-select b { display:block; font-size:10px; overflow-wrap:anywhere; }
+.quick-middle-select small { display:block; margin-top:2px; font-size:9px; opacity:.67; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.quick-middle-row .mini-danger { width:32px; height:32px; padding:0; }
+.middle-editor-title {
+  font-size:11px;
+  font-weight:900;
+  margin:0 0 9px;
+  color:#2a2723;
+}
+.book-middle-block {
+  align-self:stretch;
+  width:100%;
+  text-align:center;
+  font-size:8.5px;
+  line-height:1.25;
+  color:#7b766e;
+  margin:0;
+  letter-spacing:.01em;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.conversation-empty {
+  text-align:center;
+  color:#aaa39a;
+  font-size:9px;
+  padding:8mm 0;
+}
+.ocr-middle-list { margin-bottom:7px; }
+@media (max-width: 760px) {
+  .tweet-character-toggle { padding:5px 7px; }
+}
+
+
+/* Pasted-transcript import and optional 1-on-1 speaker mapping. */
+.paste-card-editor { margin: 0; }
+.paste-editor-panel { min-width: 0; }
+.paste-editor-panel .paste-card { height: 100%; border-radius: 18px; }
+.paste-speaker-mapping { margin-top: 14px; padding: 13px; border: 1px solid #d7d1c8; border-radius: 14px; background: #fff; display: grid; gap: 10px; }
+.paste-mapping-title { font-size: 12px; font-weight: 800; color: #24221f; }
+.paste-speaker-mapping label { display: grid; gap: 5px; font-size: 11px; font-weight: 750; color: #69645c; }
+.paste-mapping-warning { color: #9a2626; font-size: 11px; }
+.paste-mapping-hint { color: #777168; font-size: 11px; line-height: 1.45; }
+.paste-mapping-actions { display: grid; gap: 7px; }
+.paste-mapping-actions button { width: 100%; }
+.paste-mapping-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.paste-editor-panel .paste-heading { align-items: flex-start; }
+.paste-editor-panel textarea { min-height: 250px; }
+.paste-editor-panel .paste-heading span { line-height: 1.4; }
+@media (max-width: 1100px) {
+  .paste-editor-panel { grid-column: 1 / -1; }
+}
