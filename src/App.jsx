@@ -1805,10 +1805,6 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div>
-          <div className="eyebrow">CONVERSATION → BOOK</div>
-          <h1>{mode === 'tweet' ? 'Tweet Renderer' : mode === 'imessage' ? 'iMessage Renderer' : mode === 'notifications' ? 'Lockscreen Notifications' : 'Conversation Renderer'}</h1>
-        </div>
         {mode && (
           <div className="top-actions">
             <button type="button" className="home-top-button" onClick={resetProject} aria-label="Back to converter home" title="Back to home">
@@ -1818,6 +1814,10 @@ export default function App() {
             </button>
           </div>
         )}
+        <div className="topbar-heading">
+          <div className="eyebrow">CONVERSATION → BOOK</div>
+          <h1>{mode === 'tweet' ? 'Tweet Renderer' : mode === 'imessage' ? 'iMessage Renderer' : mode === 'notifications' ? 'Lockscreen Notifications' : 'Conversation Renderer'}</h1>
+        </div>
       </header>
 
       {screen === 'home' && (
@@ -1991,21 +1991,7 @@ export default function App() {
                     onSelectMiddleText={selectMiddleText}
                     onDeleteMiddleText={deleteMiddleText}
                   />
-                ) : (
-                  <details className="paste-editor-panel source-panel">
-                    <summary className="compact-details-summary">Paste more conversation</summary>
-                    <PasteTextPanel
-                      editor
-                      value={pastedText}
-                      onChange={value => { setPastedText(value); setPendingPasteImport(null) }}
-                      onPrepare={preparePastedText}
-                      pendingImport={pendingPasteImport}
-                      onPendingChange={updatePendingPasteImport}
-                      onConfirm={confirmPendingPasteImport}
-                      onCancel={() => setPendingPasteImport(null)}
-                    />
-                  </details>
-                )}
+                ) : null}
                 <div className="preview-panel">
                   <div className="panel-heading"><span>Long book preview</span><span>{settings.page.width} mm wide</span></div>
                   <div className="pages-stage">
@@ -2032,6 +2018,21 @@ export default function App() {
                 </div>
                 <div className="control-panel imessage-control-panel">
                   <div className="imessage-editor-head"><div><div className="mini-eyebrow">IPHONE-STYLE EDITOR</div><strong>{imessageInputMode === 'manual' ? 'Manual message editor' : 'Pasted message editor'}</strong></div><div className="right-panel-head-actions"><button type="button" className="subtle-danger-button" onClick={startOverCurrent}>Start over</button><span className="editor-live-pill">LIVE</span></div></div>
+                  {imessageInputMode === 'paste' && (
+                    <details className="paste-editor-panel paste-more-collapsible">
+                      <summary className="compact-details-summary">Paste more conversation <span className="paste-more-hint">Click to expand</span></summary>
+                      <PasteTextPanel
+                        editor
+                        value={pastedText}
+                        onChange={value => { setPastedText(value); setPendingPasteImport(null) }}
+                        onPrepare={preparePastedText}
+                        pendingImport={pendingPasteImport}
+                        onPendingChange={updatePendingPasteImport}
+                        onConfirm={confirmPendingPasteImport}
+                        onCancel={() => setPendingPasteImport(null)}
+                      />
+                    </details>
+                  )}
 
                   {imessageInputMode === 'manual' ? (
                     <>

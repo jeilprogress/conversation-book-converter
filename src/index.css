@@ -1243,3 +1243,32 @@ input:focus, textarea:focus, select:focus { border-color: #888177; box-shadow: 0
   .preview-quick-entry { flex-direction: column; }
   .preview-quick-entry button { width: 100%; min-height: 38px; }
 }
+
+/* Home left; paste-more is a discoverable collapsed panel beside iMessage editing. */
+.topbar { justify-content: flex-start; gap: 12px; }
+.topbar-heading { min-width: 0; }
+.topbar > .top-actions { flex: 0 0 auto; }
+.paste-more-collapsible {
+  display: block; width: 100%; margin: 11px 0 13px;
+  border: 1px solid #d5d1c9; border-radius: 13px;
+  overflow: hidden; background: #faf9f7;
+}
+.paste-more-collapsible > .compact-details-summary {
+  display: list-item; padding: 13px 12px;
+  background: #f3f1ec; font-weight: 800; font-size: 11px;
+  line-height: 1.5; color: #282522;
+}
+.paste-more-collapsible .paste-more-hint {
+  display: inline-block; font-size: 9px; font-weight: 500;
+  color: #746e66; margin-left: 5px; letter-spacing: normal;
+}
+.paste-more-collapsible[open] .paste-more-hint { display: none; }
+.paste-more-collapsible .paste-card {
+  margin: 0; border: 0; border-top: 1px solid #ddd8cf;
+  border-radius: 0; background: #f8f7f4;
+}
+.paste-more-collapsible .paste-card textarea { min-height: 120px; }
+@media (max-width: 760px) {
+  .topbar { flex-direction: row; align-items: center; padding: 14px 16px; gap: 11px; }
+  .topbar-heading h1 { font-size: clamp(19px,5vw,25px); }
+}
