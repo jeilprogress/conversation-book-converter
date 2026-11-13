@@ -17,6 +17,11 @@ export function snapshotPreview(node) {
     for (const property of computed) {
       copy.style.setProperty(property, computed.getPropertyValue(property))
     }
+    // Logical border properties can override physical sides when serialized
+    // outside the document. Write the resolved sides last.
+    for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
+      copy.style[`border${side}`] = `${computed[`border${side}Width`]} ${computed[`border${side}Style`]} ${computed[`border${side}Color`]}`
+    }
     if (computed.display !== 'inline' && computed.display !== 'contents' && computed.display !== 'none' && original instanceof HTMLElement) {
       const rect = original.getBoundingClientRect()
       copy.style.boxSizing = 'border-box'
@@ -43,6 +48,11 @@ export function snapshotPreview(node) {
         if (!rect.width || !rect.height) continue
         let line = lines[lines.length - 1]
         if (!line || Math.abs(line.top - rect.top) > 1) {
+          const lineHeight = parseFloat(getComputedStyle(original).lineHeight)
+          if (line && lineHeight > 0) {
+            const missing = Math.round((rect.top - line.top) / lineHeight) - 1
+            for (let blank = 0; blank < missing; blank++) lines.push({ top: line.top + (blank + 1) * lineHeight, text: '' })
+          }
           line = { top: rect.top, text: '' }
           lines.push(line)
         }
@@ -55,7 +65,7 @@ export function snapshotPreview(node) {
       span.style.whiteSpace = 'pre'
       span.style.font = 'inherit'
       span.style.lineHeight = 'inherit'
-      span.textContent = line.text
+      span.textContent = line.text || '\u00a0'
       return span
     }))
   })
