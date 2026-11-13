@@ -67,5 +67,5 @@ export async function capturePreview(node, options = {}) {
   const snapshot = snapshotPreview(node)
   // The detached snapshot already contains every computed style. Prevent the
   // library from replacing them with a second, potentially different layout.
-  return toPng(snapshot, { width: rect.width, height: rect.height, ...options, includeStyleProperties: [], skipFonts: true })
+  return toPng(snapshot, { width: rect.width, height: rect.height, ...options, style: { margin: '0', ...options.style }, includeStyleProperties: [], skipFonts: true })
 }
