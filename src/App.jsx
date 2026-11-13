@@ -11,7 +11,7 @@ const PAGE_SIZES = {
 
 const CHARACTER_STORAGE_KEY = 'conversation-book-characters-v23'
 const IMESSAGE_CHARACTER_STORAGE_KEY = 'conversation-book-imessage-characters-v1'
-const IMESSAGE_SPLIT_HEIGHT_MM = 170
+const IMESSAGE_SPLIT_HEIGHT_MM = 171.9
 const IMESSAGE_VERTICAL_MARGIN_MM = 5
 const uid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
 
@@ -562,7 +562,7 @@ function MiddleDndFields({ item, onUpdate, defaultName = '' }) {
   )
 }
 
-function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExportPdf, status }) {
+function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExportPdf, onCopyImage, status }) {
   const [topName, setTopName] = useState('Acielo Vergara')
   const [autoCount, setAutoCount] = useState(true)
   const [countLine, setCountLine] = useState('2 New Notifications')
@@ -600,6 +600,7 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
           <strong>{cards.length} notification{cards.length === 1 ? '' : 's'} · compact black-and-white layout</strong>
         </div>
         <div className="toolbar-right">
+          <button type="button" className="ghost" onClick={onCopyImage}>Copy image</button>
           <button type="button" className="ghost" onClick={onExportPng}>Export PNG</button>
           <button type="button" className="primary" onClick={onExportPdf}>Export PDF</button>
         </div>
@@ -1675,7 +1676,7 @@ export default function App() {
         else pdf.addPage([settings.page.width, IMESSAGE_SPLIT_HEIGHT_MM], 'portrait')
         pdf.addImage(png, 'PNG', 0, 0, settings.page.width, IMESSAGE_SPLIT_HEIGHT_MM, undefined, 'FAST')
       })
-      pdf.save('imessage-book-split-17cm.pdf')
+      pdf.save(`imessage-book-split-${IMESSAGE_SPLIT_HEIGHT_MM / 10}cm.pdf`)
       setStatus(`Split PDF exported · ${ranges.length} page${ranges.length === 1 ? '' : 's'} · ${IMESSAGE_SPLIT_HEIGHT_MM / 10} cm high each.`)
       return
     }
@@ -1903,6 +1904,7 @@ export default function App() {
           setSettings={setSettings}
           onExportPng={exportPng}
           onExportPdf={exportPdf}
+          onCopyImage={copyImage}
           status={status}
         />
       )}
@@ -2001,7 +2003,7 @@ export default function App() {
                     <div className="export-mode-control" aria-label="iMessage export layout">
                       <span>Export</span>
                       <button type="button" className={settings.imessageExportLayout === 'long' ? 'selected' : ''} onClick={() => setSettings(prev => ({ ...prev, imessageExportLayout: 'long' }))}>Long</button>
-                      <button type="button" className={settings.imessageExportLayout === 'split' ? 'selected' : ''} onClick={() => setSettings(prev => ({ ...prev, imessageExportLayout: 'split' }))}>17 cm pages</button>
+                      <button type="button" className={settings.imessageExportLayout === 'split' ? 'selected' : ''} onClick={() => setSettings(prev => ({ ...prev, imessageExportLayout: 'split' }))}>{IMESSAGE_SPLIT_HEIGHT_MM / 10} cm pages</button>
                     </div>
                   </>
                 )}
