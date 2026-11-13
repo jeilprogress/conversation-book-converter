@@ -31,7 +31,8 @@ async function main() {
       }, text)
       if (text === 'alam ko.') assert.deepEqual(result.lines, ['alam ko.'])
       else assert.ok(result.lines.length > 1)
-      const preview = PNG.sync.read(await page.locator('.book-page').screenshot())
+      const previewBuffer = await page.locator('.book-page').screenshot()
+      const preview = PNG.sync.read(previewBuffer)
       const output = PNG.sync.read(Buffer.from(result.png.split(',')[1], 'base64'))
       assert.equal(output.width, preview.width)
       assert.equal(output.height, preview.height)
@@ -41,6 +42,10 @@ async function main() {
       }
       const difference = different / (preview.width * preview.height)
       console.log({ text, lines: result.lines, difference })
+      if (difference >= 0.015) {
+        console.log('PREVIEW_IMAGE=' + previewBuffer.toString('base64'))
+        console.log('EXPORT_IMAGE=' + result.png.split(',')[1])
+      }
       assert.ok(difference < 0.015, `Export differs from preview: ${difference}`)
     }
   } finally {
