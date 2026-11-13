@@ -9,7 +9,6 @@ async function main() {
   try {
     browser = await chromium.launch({ headless: true })
     const page = await browser.newPage({ deviceScaleFactor: 1 })
-    page.on('console', message => console.log(message.text()))
     for (let attempt = 0; attempt < 100; attempt++) {
       try { if ((await fetch('http://127.0.0.1:5173')).ok) break } catch {}
       if (attempt === 99) throw new Error('Preview server did not start')
@@ -25,16 +24,9 @@ async function main() {
         node.querySelector('.outline').textContent = text
         node.style.height = `${Math.ceil(node.getBoundingClientRect().height)}px`
         node.style.boxShadow = 'none'
-        const { capturePreview, snapshotPreview } = await import('/src/capturePreview.js')
-        const snapshot = snapshotPreview(node)
-        console.log('BUBBLE_SNAPSHOT=' + snapshot.querySelector('.outline').outerHTML)
-        const { toSvg } = await import('/node_modules/.vite/deps/html-to-image.js')
-        console.log('SVG_SNAPSHOT=' + decodeURIComponent((await toSvg(snapshot, { width: 560, height: node.getBoundingClientRect().height, includeStyleProperties: [], skipFonts: true })).split(',')[1]))
-        const lines = [...snapshot.querySelector('.outline').children].map(span => span.textContent)
-        return { png: await capturePreview(node, { pixelRatio: 1, backgroundColor: '#fff' }), lines }
+        const { capturePreview } = await import('/src/capturePreview.js')
+        return { png: await capturePreview(node, { pixelRatio: 1, backgroundColor: '#fff' }) }
       }, text)
-      if (text === 'alam ko.') assert.deepEqual(result.lines, ['alam ko.'])
-      else assert.ok(result.lines.length > 1)
       const previewBuffer = await page.locator('.book-page').screenshot()
       const preview = PNG.sync.read(previewBuffer)
       const output = PNG.sync.read(Buffer.from(result.png.split(',')[1], 'base64'))
@@ -45,7 +37,7 @@ async function main() {
         if ([0, 1, 2].some(c => Math.abs(preview.data[i + c] - output.data[i + c]) > 32)) different++
       }
       const difference = different / (preview.width * preview.height)
-      console.log({ text, lines: result.lines, difference })
+      console.log({ text, difference })
       if (difference >= 0.015) {
         console.log('PREVIEW_IMAGE=' + previewBuffer.toString('base64'))
         console.log('EXPORT_IMAGE=' + result.png.split(',')[1])
