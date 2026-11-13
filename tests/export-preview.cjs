@@ -9,6 +9,7 @@ async function main() {
   try {
     browser = await chromium.launch({ headless: true })
     const page = await browser.newPage({ deviceScaleFactor: 1 })
+    page.on('console', message => console.log(message.text()))
     for (let attempt = 0; attempt < 100; attempt++) {
       try { if ((await fetch('http://127.0.0.1:5173')).ok) break } catch {}
       if (attempt === 99) throw new Error('Preview server did not start')
@@ -26,6 +27,9 @@ async function main() {
         node.style.boxShadow = 'none'
         const { capturePreview, snapshotPreview } = await import('/src/capturePreview.js')
         const snapshot = snapshotPreview(node)
+        console.log('BUBBLE_SNAPSHOT=' + snapshot.querySelector('.outline').outerHTML)
+        const { toSvg } = await import('/node_modules/.vite/deps/html-to-image.js')
+        console.log('SVG_SNAPSHOT=' + decodeURIComponent((await toSvg(snapshot, { width: 560, height: node.getBoundingClientRect().height, includeStyleProperties: [], skipFonts: true })).split(',')[1]))
         const lines = [...snapshot.querySelector('.outline').children].map(span => span.textContent)
         return { png: await capturePreview(node, { pixelRatio: 1, backgroundColor: '#fff' }), lines }
       }, text)
