@@ -1,0 +1,19 @@
+name: Verify preview exports
+on:
+  push:
+    branches: [fix/freeze-export-lines]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  export-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npm install --no-save playwright pngjs
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/export-preview.cjs
+      - run: npm run build

@@ -1,31 +1,21 @@
-import { toPng } from 'html-to-image'
+import html2canvas from 'html2canvas'
 
-// Freeze the browser's resolved layout before html-to-image clones it. In
-// particular, retain fractional font sizes and border-box bubble dimensions.
-// html-to-image's default style copier rounds font sizes and reapplies CSS
-// shorthands, which can change wrapping inside a fixed-height cloned bubble.
-export async function capturePreview(node, options) {
-  const snapshot = node.cloneNode(true)
-  const originals = [node, ...node.querySelectorAll('*')]
-  const copies = [snapshot, ...snapshot.querySelectorAll('*')]
-  originals.forEach((original, index) => {
-    const copy = copies[index]
-    const computed = getComputedStyle(original)
-    if (!copy.style) return
-    copy.style.cssText = ''
-    // Only copy longhands: later shorthands can reset previously copied values.
-    for (const property of computed) {
-      copy.style.setProperty(property, computed.getPropertyValue(property))
-    }
-    if (computed.display !== 'inline' && computed.display !== 'contents' && computed.display !== 'none' && original instanceof HTMLElement) {
-      const rect = original.getBoundingClientRect()
-      copy.style.boxSizing = 'border-box'
-      copy.style.width = `${rect.width}px`
-      copy.style.height = `${rect.height}px`
-      copy.style.flexShrink = '0'
-    }
+// Paint the browser's laid-out text and borders directly. SVG foreignObject
+// conversion lays text out again and can wrap short replies inside fixed boxes.
+export async function capturePreview(node, options = {}) {
+  await document.fonts?.ready
+  const rect = node.getBoundingClientRect()
+  const width = options.width ?? rect.width
+  const height = options.height ?? rect.height
+  const canvas = await html2canvas(node, {
+    width: Math.ceil(width),
+    height: Math.ceil(height),
+    scale: (options.pixelRatio ?? 2) * ((options.canvasWidth ?? width) / width),
+    backgroundColor: options.backgroundColor ?? '#ffffff',
+    windowWidth: document.documentElement.clientWidth,
+    windowHeight: document.documentElement.clientHeight,
+    logging: false,
+    foreignObjectRendering: false,
   })
-  // The detached snapshot already contains every computed style. Prevent the
-  // library from replacing them with a second, potentially different layout.
-  return toPng(snapshot, { ...options, includeStyleProperties: [], skipFonts: true })
+  return canvas.toDataURL('image/png')
 }
