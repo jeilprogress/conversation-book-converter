@@ -42,17 +42,19 @@ async function main() {
         for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
           if (x + dx < 0 || x + dx >= preview.width || y + dy < 0 || y + dy >= preview.height) continue
           const j = ((y + dy) * preview.width + x + dx) * 4
-          if ([0, 1, 2].every(c => Math.abs(preview.data[i + c] - output.data[j + c]) <= 32)) matches = true
+          const previewInk = (preview.data[i] + preview.data[i + 1] + preview.data[i + 2]) / 3 < 128
+          const outputInk = (output.data[j] + output.data[j + 1] + output.data[j + 2]) / 3 < 128
+          if (previewInk === outputInk) matches = true
         }
         if (!matches) different++
       }
       const difference = different / (preview.width * preview.height)
       console.log({ text, difference })
-      if (difference >= 0.006) {
+      if (difference >= 0.0008) {
         console.log('PREVIEW_IMAGE=' + previewBuffer.toString('base64'))
         console.log('EXPORT_IMAGE=' + result.png.split(',')[1])
       }
-      assert.ok(difference < 0.006, `Export differs from preview: ${difference}`)
+      assert.ok(difference < 0.0008, `Export differs from preview: ${difference}`)
     }
   } finally {
     await browser?.close()
