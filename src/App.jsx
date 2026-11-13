@@ -270,8 +270,9 @@ function TweetPage({ tweets, characters, settings, pageRef }) {
 
 function TweetComposer({ selected, tweets, characters, onChange, onAddCharacter, onDeleteCharacter, onUpdateCharacter, onAddPost, onUseCharacter, showCharacterLibrary, onToggleCharacterLibrary }) {
   const selectedQuote = tweets.find(t => t.id === selected?.quoteId)
-  const mainParents = tweets.filter(t => t.id !== selected?.id && t.type === 'main')
-  const replyParents = tweets.filter(t => t.id !== selected?.id && t.type === 'reply')
+  const availablePosts = tweets.filter(t => t.id !== selected?.id)
+  const mainParents = availablePosts.filter(t => t.type === 'main')
+  const replyParents = availablePosts.filter(t => t.type === 'reply' || t.type === 'nestedReply')
 
   const labelForTweet = (tweet, fallback) => {
     const character = characters.find(c => c.id === tweet.characterId)
@@ -357,7 +358,7 @@ function TweetComposer({ selected, tweets, characters, onChange, onAddCharacter,
           <label className="compact-field">Quote this post
             <select value={selected.quoteId || ''} onChange={e => onChange({ quoteId: e.target.value || null })}>
               <option value="">Choose any tweet or reply…</option>
-              {tweets.filter(t => t.id !== selected.id).map((tweet, index) => <option key={tweet.id} value={tweet.id}>{labelForTweet(tweet, `Post ${index + 1}`)}</option>)}
+              {availablePosts.map((tweet, index) => <option key={tweet.id} value={tweet.id}>{labelForTweet(tweet, `Post ${index + 1}`)}</option>)}
             </select>
           </label>
         )}
@@ -1333,7 +1334,7 @@ export default function App() {
     }
     if (patch.type === 'nestedReply') {
       patch.quoteId = null
-      const reply = tweets.find(t => t.type === 'reply' && t.id !== selectedId)
+      const reply = tweets.find(t => (t.type === 'reply' || t.type === 'nestedReply') && t.id !== selectedId)
       if (patch.parentId === undefined) patch.parentId = reply?.id || null
     }
     updateTweet(selectedId, patch)
