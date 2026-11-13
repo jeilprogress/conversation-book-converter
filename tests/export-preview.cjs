@@ -9,6 +9,11 @@ async function main() {
   try {
     browser = await chromium.launch({ headless: true })
     const page = await browser.newPage({ deviceScaleFactor: 1 })
+    for (let attempt = 0; attempt < 100; attempt++) {
+      try { if ((await fetch('http://127.0.0.1:5173')).ok) break } catch {}
+      if (attempt === 99) throw new Error('Preview server did not start')
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
     await page.goto('http://127.0.0.1:5173', { waitUntil: 'networkidle' })
     for (const text of ['alam ko.', 'This is a much longer reply that must wrap over several lines without changing the visible preview.']) {
       const result = await page.evaluate(async text => {
