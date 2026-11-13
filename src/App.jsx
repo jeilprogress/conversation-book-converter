@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
-import { toPng } from 'html-to-image'
+import { capturePreview } from './capturePreview'
 import jsPDF from 'jspdf'
 import { parsePastedConversation } from './pasteParser'
 
@@ -1418,7 +1418,7 @@ export default function App() {
         node.style.top = `${-topOffsetPx}px`
       }
 
-      return await toPng(node, {
+      return await capturePreview(node, {
         width: captureWidthPx,
         height: captureHeightPx,
         canvasWidth: Math.ceil(captureWidthPx * pixelRatio),
@@ -1508,7 +1508,7 @@ export default function App() {
         node.style.top = `${-top}px`
 
         const pixelRatio = 2
-        const png = await toPng(viewport, {
+        const png = await capturePreview(viewport, {
           width: widthPx,
           height: sliceHeight,
           canvasWidth: Math.ceil(widthPx * pixelRatio),
@@ -1736,6 +1736,41 @@ export default function App() {
       await new Promise(resolve => setTimeout(resolve, 120))
     }
     setStatus(`PNG exported without cropping · ${slices.length} file${slices.length === 1 ? '' : 's'}.`)
+  }
+
+  async function copyImage() {
+    if (!pageRef.current) return
+    if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+      setStatus('Image copying is unavailable in this browser. Use Export PNG instead.')
+      return
+    }
+    try {
+      setStatus('Preparing image for clipboard…')
+      // Start the clipboard write during the click gesture (required by Safari).
+      const image = (async () => {
+        const slices = await renderPagePng()
+        if (!slices.length) throw new Error('No image to copy')
+        if (slices.length === 1) return (await fetch(slices[0].png)).blob()
+        const images = await Promise.all(slices.map(slice => new Promise((resolve, reject) => {
+          const img = new Image()
+          img.onload = () => resolve(img)
+          img.onerror = reject
+          img.src = slice.png
+        })))
+        const canvas = document.createElement('canvas')
+        canvas.width = images[0].width
+        canvas.height = images.reduce((height, img) => height + img.height, 0)
+        const context = canvas.getContext('2d')
+        if (!context) throw new Error('Cannot create image')
+        let top = 0
+        images.forEach(img => { context.drawImage(img, 0, top); top += img.height })
+        return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image too large')), 'image/png'))
+      })()
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': image })])
+      setStatus('Image copied · ready to paste.')
+    } catch {
+      setStatus('Could not copy the image. Check clipboard permission or use Export PNG.')
+    }
   }
 
   function startOverCurrent() {
@@ -1970,6 +2005,7 @@ export default function App() {
                     </div>
                   </>
                 )}
+                <button className="ghost" onClick={copyImage}>Copy image</button>
                 <button className="ghost" onClick={exportPng}>{mode === 'imessage' && settings.imessageExportLayout === 'split' ? 'Export PNGs' : 'Export long PNG'}</button>
                 <button className="primary" onClick={exportPdf}>{mode === 'imessage' && settings.imessageExportLayout === 'split' ? 'Export split PDF' : 'Export long PDF'}</button>
               </div>
@@ -2244,3 +2280,4 @@ export default function App() {
     </div>
   )
 }
+
