@@ -4,7 +4,7 @@ import { toPng } from 'html-to-image'
 // particular, retain fractional font sizes and border-box bubble dimensions.
 // html-to-image's default style copier rounds font sizes and reapplies CSS
 // shorthands, which can change wrapping inside a fixed-height cloned bubble.
-export async function capturePreview(node, options) {
+export function snapshotPreview(node) {
   const snapshot = node.cloneNode(true)
   const originals = [node, ...node.querySelectorAll('*')]
   const copies = [snapshot, ...snapshot.querySelectorAll('*')]
@@ -25,6 +25,45 @@ export async function capturePreview(node, options) {
       copy.style.flexShrink = '0'
     }
   })
+  // Freeze visual lines as well as the outer boxes. ForeignObject can rewrap
+  // a tight reply even when its fixed bubble dimensions have been preserved.
+  originals.forEach((original, index) => {
+    if (!original.matches?.('.book-bubble')) return
+    const lines = []
+    const walker = document.createTreeWalker(original, NodeFilter.SHOW_TEXT)
+    const range = document.createRange()
+    let textNode
+    while ((textNode = walker.nextNode())) {
+      let offset = 0
+      for (const character of textNode.data) {
+        range.setStart(textNode, offset)
+        offset += character.length
+        range.setEnd(textNode, offset)
+        const rect = range.getBoundingClientRect()
+        if (!rect.width || !rect.height) continue
+        let line = lines[lines.length - 1]
+        if (!line || Math.abs(line.top - rect.top) > 1) {
+          line = { top: rect.top, text: '' }
+          lines.push(line)
+        }
+        line.text += character
+      }
+    }
+    copies[index].replaceChildren(...lines.map(line => {
+      const span = document.createElement('span')
+      span.style.display = 'block'
+      span.style.whiteSpace = 'pre'
+      span.style.font = 'inherit'
+      span.style.lineHeight = 'inherit'
+      span.textContent = line.text
+      return span
+    }))
+  })
+  return snapshot
+}
+
+export async function capturePreview(node, options) {
+  const snapshot = snapshotPreview(node)
   // The detached snapshot already contains every computed style. Prevent the
   // library from replacing them with a second, potentially different layout.
   return toPng(snapshot, { ...options, includeStyleProperties: [], skipFonts: true })
