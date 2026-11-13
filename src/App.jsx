@@ -12,9 +12,9 @@ const PAGE_SIZES = {
 const CHARACTER_STORAGE_KEY = 'conversation-book-characters-v23'
 const IMESSAGE_CHARACTER_STORAGE_KEY = 'conversation-book-imessage-characters-v1'
 // A5 Word: 148 - 25.4 inside - 17.8 outside = 104.8 mm wide.
-// 171.9 mm usable height / (104.8 / 148) = 242.7595 mm.
-// Round down so the image stays within the available height.
-const IMESSAGE_SPLIT_HEIGHT_MM = 242.7
+// Leave 7 mm above the footer/page number: (171.9 - 7) / (104.8 / 148).
+// Round down so Word's scaled image stays within the reserved height.
+const IMESSAGE_SPLIT_HEIGHT_MM = 232.8
 const IMESSAGE_VERTICAL_MARGIN_MM = 5
 const uid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
 
