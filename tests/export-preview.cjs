@@ -34,15 +34,25 @@ async function main() {
       assert.equal(output.height, preview.height)
       let different = 0
       for (let i = 0; i < preview.data.length; i += 4) {
-        if ([0, 1, 2].some(c => Math.abs(preview.data[i + c] - output.data[i + c]) > 32)) different++
+        const x = (i / 4) % preview.width
+        const y = Math.floor(i / 4 / preview.width)
+        let matches = false
+        // Canvas and screenshots rasterize fractional glyph positions slightly
+        // differently. Allow one pixel of antialiasing, not moved/wrapped text.
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          if (x + dx < 0 || x + dx >= preview.width || y + dy < 0 || y + dy >= preview.height) continue
+          const j = ((y + dy) * preview.width + x + dx) * 4
+          if ([0, 1, 2].every(c => Math.abs(preview.data[i + c] - output.data[j + c]) <= 32)) matches = true
+        }
+        if (!matches) different++
       }
       const difference = different / (preview.width * preview.height)
       console.log({ text, difference })
-      if (difference >= 0.015) {
+      if (difference >= 0.006) {
         console.log('PREVIEW_IMAGE=' + previewBuffer.toString('base64'))
         console.log('EXPORT_IMAGE=' + result.png.split(',')[1])
       }
-      assert.ok(difference < 0.015, `Export differs from preview: ${difference}`)
+      assert.ok(difference < 0.006, `Export differs from preview: ${difference}`)
     }
   } finally {
     await browser?.close()
