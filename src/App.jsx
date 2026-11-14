@@ -21,7 +21,7 @@ function normalizeText(text) {
     .replace(/\u00a0/g, ' ')
     .replace(/[\t ]+/g, ' ')
     .replace(/\s*\n\s*/g, ' ')
-    .replace(/\s+([,.!?;:])/g, '$1')
+    .replace(/\s+([,.!?;]|:(?!-?[()]))/g, '$1')
     .trim()
 }
 
@@ -30,7 +30,7 @@ function formatMessageText(text) {
     .replace(/\u00a0/g, ' ')
     .replace(/[\t ]+/g, ' ')
     .split(/\r?\n/)
-    .map(line => line.trim().replace(/\s+([,.!?;:])/g, '$1'))
+    .map(line => line.trim().replace(/\s+([,.!?;]|:(?!-?[()]))/g, '$1'))
     .join('\n')
     .trim()
 }
@@ -666,7 +666,7 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
         <section className="preview-panel notification-preview-panel">
           <div className="panel-heading"><span>Book preview</span><span>{settings.page.width} mm wide</span></div>
           <div className="pages-stage">
-            <div ref={pageRef} className="book-page notification-book-page" style={{ width: settings.page.width + 'mm' }}>
+            <div ref={pageRef} className="book-page notification-book-page" style={{ width: settings.page.width + 'mm', fontFamily: settings.font }}>
               {topName && <div className="notification-top-name">{topName}</div>}
               <div className="notification-count-line">{heading}</div>
               <div className="notification-preview-stack">

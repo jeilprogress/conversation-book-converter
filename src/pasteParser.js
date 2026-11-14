@@ -10,7 +10,7 @@ function cleanMessageText(value) {
   return String(value ?? '')
     .replace(/\u00a0/g, ' ')
     .replace(/[\t ]+/g, ' ')
-    .replace(/\s+([,.!?;:])/g, '$1')
+    .replace(/\s+([,.!?;]|:(?!-?[()]))/g, '$1')
     .trim()
 }
 
