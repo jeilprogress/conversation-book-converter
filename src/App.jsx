@@ -16,8 +16,19 @@ const IMESSAGE_SPLIT_HEIGHT_MM = 210
 const IMESSAGE_VERTICAL_MARGIN_MM = 5
 const uid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
 
+function smartPunctuation(value) {
+  return String(value ?? '')
+    // Apostrophes within words, shortened years, and common English/Tagalog elisions.
+    .replace(/([\p{L}\p{N}])'(?=[\p{L}\p{N}])/gu, '$1’')
+    .replace(/(^|[\s([{—–])'(?=(?:\d{2}\b|(?:yung|yon|yan|yun|wag|di|to|tong|yan|yang|kaw|twas|tis|cause|em)\b))/giu, '$1’')
+    .replace(/(^|[\s([{—–])"/g, '$1“')
+    .replace(/"/g, '”')
+    .replace(/(^|[\s([{“—–])'/g, '$1‘')
+    .replace(/'/g, '’')
+}
+
 function normalizeText(text) {
-  return String(text || '')
+  return smartPunctuation(text)
     .replace(/\u00a0/g, ' ')
     .replace(/[\t ]+/g, ' ')
     .replace(/\s*\n\s*/g, ' ')
@@ -26,7 +37,7 @@ function normalizeText(text) {
 }
 
 function formatMessageText(text) {
-  return String(text || '')
+  return smartPunctuation(text)
     .replace(/\u00a0/g, ' ')
     .replace(/[\t ]+/g, ' ')
     .split(/\r?\n/)
@@ -38,7 +49,7 @@ function formatMessageText(text) {
 function formatManualMessageText(text) {
   // Manual messages preserve the user's spaces and intentional Shift+Enter
   // line breaks. We only normalize Windows/macOS line endings.
-  return String(text ?? '')
+  return smartPunctuation(text)
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
 }
@@ -667,18 +678,18 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
           <div className="panel-heading"><span>Book preview</span><span>{settings.page.width} mm wide</span></div>
           <div className="pages-stage">
             <div ref={pageRef} className="book-page notification-book-page" style={{ width: settings.page.width + 'mm', fontFamily: settings.font }}>
-              {topName && <div className="notification-top-name">{topName}</div>}
-              <div className="notification-count-line">{heading}</div>
+              {topName && <div className="notification-top-name">{smartPunctuation(topName)}</div>}
+              <div className="notification-count-line">{smartPunctuation(heading)}</div>
               <div className="notification-preview-stack">
                 {cards.map(card => (
                   <div className="notification-preview-card" key={card.id}>
-                    <div className="notification-app-label">{card.app}</div>
-                    <div className="notification-contact-label">{card.sender}</div>
-                    <div className="notification-message-text">{card.message}</div>
+                    <div className="notification-app-label">{smartPunctuation(card.app)}</div>
+                    <div className="notification-contact-label">{smartPunctuation(card.sender)}</div>
+                    <div className="notification-message-text">{smartPunctuation(card.message)}</div>
                   </div>
                 ))}
               </div>
-              {dndEnabled && <div className="notification-dnd-footer"><span aria-hidden="true">☾</span> {dndText}</div>}
+              {dndEnabled && <div className="notification-dnd-footer"><span aria-hidden="true">☾</span> {smartPunctuation(dndText)}</div>}
             </div>
           </div>
         </section>
