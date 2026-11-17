@@ -225,7 +225,7 @@ function QuotePreview({ tweet, allTweets, fontSize }) {
         {targetChar?.isPrivate && <PrivateLock size={10} />}
       </div>
       <div className="quote-handle">{targetChar?.handle || '@username'}</div>
-      <div className="quote-text" style={{ fontSize: `${Math.max(9, fontSize - 1)}px` }}>{normalizeText(target.text)}</div>
+      <div className="quote-text" style={{ fontSize: `${Math.max(9, fontSize - 1)}px` }}>{formatManualMessageText(target.text)}</div>
     </div>
   )
 }
@@ -252,7 +252,7 @@ function TweetCard({ tweet, allTweets, fontSize, width = 100 }) {
       </div>
 
       {reply && tweet.parentHandle && <div className="tweet-reply-line">Replying to {tweet.parentHandle}</div>}
-      <div className="tweet-text-v2" style={{ fontSize: `${Math.max(9, fontSize - level * 0.8)}px` }}>{normalizeText(tweet.text)}</div>
+      <div className="tweet-text-v2" style={{ fontSize: `${Math.max(9, fontSize - level * 0.8)}px` }}>{formatManualMessageText(tweet.text)}</div>
       {tweet.type === 'quote' && quoteTarget && <QuotePreview tweet={tweet} allTweets={allTweets} fontSize={fontSize} />}
     </div>
   )
