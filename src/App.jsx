@@ -576,6 +576,10 @@ function MiddleDndFields({ item, onUpdate, defaultName = '' }) {
   )
 }
 
+function newNotificationCard() {
+  return { id: uid(), app: 'message', sender: '', message: '' }
+}
+
 function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExportPdf, onCopyImage, status }) {
   const [names, setNames] = useState(() => {
     try {
@@ -589,7 +593,7 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
   const [topName, setTopName] = useState('')
   const [autoCount, setAutoCount] = useState(true)
   const [countLine, setCountLine] = useState('')
-  const [cards, setCards] = useState([])
+  const [cards, setCards] = useState(() => [newNotificationCard()])
   const [dndEnabled, setDndEnabled] = useState(false)
   const [dndText, setDndText] = useState('')
   const trimmedName = newName.trim()
@@ -610,7 +614,7 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
     setCards(old => old.map(card => card.id === id ? { ...card, ...changes } : card))
   }
   function addCard() {
-    setCards(old => [...old, { id: uid(), app: '', sender: '', message: '' }])
+    setCards(old => [...old, newNotificationCard()])
   }
   function moveCard(index, amount) {
     setCards(old => {
