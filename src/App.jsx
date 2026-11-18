@@ -11,6 +11,7 @@ const PAGE_SIZES = {
 
 const CHARACTER_STORAGE_KEY = 'conversation-book-characters-v23'
 const IMESSAGE_CHARACTER_STORAGE_KEY = 'conversation-book-imessage-characters-v1'
+const LOCKSCREEN_CHARACTER_STORAGE_KEY = 'conversation-book-lockscreen-characters-v1'
 // User-selected split page height.
 const IMESSAGE_SPLIT_HEIGHT_MM = 210
 const IMESSAGE_VERTICAL_MARGIN_MM = 5
@@ -576,20 +577,40 @@ function MiddleDndFields({ item, onUpdate, defaultName = '' }) {
 }
 
 function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExportPdf, onCopyImage, status }) {
-  const [topName, setTopName] = useState('Acielo Vergara')
+  const [names, setNames] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LOCKSCREEN_CHARACTER_STORAGE_KEY) || '[]')
+      return Array.isArray(saved) ? saved.filter(name => typeof name === 'string' && name.trim()) : []
+    } catch {
+      return []
+    }
+  })
+  const [newName, setNewName] = useState('')
+  const [topName, setTopName] = useState('')
   const [autoCount, setAutoCount] = useState(true)
-  const [countLine, setCountLine] = useState('2 New Notifications')
-  const [cards, setCards] = useState([
-    { id: uid(), app: 'message', sender: 'my zielle', message: 'Mahal kita, eh.' },
-    { id: uid(), app: 'message', sender: 'my zielle', message: 'Tapos mang-iiwan ka nanaman? Ako nanaman ang tanga?' },
-  ])
+  const [countLine, setCountLine] = useState('')
+  const [cards, setCards] = useState([])
   const [dndEnabled, setDndEnabled] = useState(false)
-  const [dndText, setDndText] = useState('Do Not Disturb')
+  const [dndText, setDndText] = useState('')
+  const trimmedName = newName.trim()
+  const canAddName = trimmedName && !names.some(name => name.toLowerCase() === trimmedName.toLowerCase())
+
+  useEffect(() => {
+    localStorage.setItem(LOCKSCREEN_CHARACTER_STORAGE_KEY, JSON.stringify(names))
+  }, [names])
+
+  function addName(event) {
+    event.preventDefault()
+    if (!canAddName) return
+    setNames(previous => [...previous, trimmedName])
+    setNewName('')
+  }
+
   function patchCard(id, changes) {
     setCards(old => old.map(card => card.id === id ? { ...card, ...changes } : card))
   }
   function addCard() {
-    setCards(old => [...old, { id: uid(), app: 'message', sender: '', message: '' }])
+    setCards(old => [...old, { id: uid(), app: '', sender: '', message: '' }])
   }
   function moveCard(index, amount) {
     setCards(old => {
@@ -622,8 +643,17 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
         <section className="notification-edit-panel">
           <div className="panel-heading"><span>Notification editor</span><span>LIVE</span></div>
           <div className="notification-edit-content">
+            <form onSubmit={addName}>
+              <label>Character name
+                <input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Enter a name" />
+              </label>
+              <button className="character-add-button" type="submit" disabled={!canAddName}>＋ Add character</button>
+            </form>
             <label>Top name
-              <input value={topName} onChange={e => setTopName(e.target.value)} placeholder="Character name" />
+              <select value={topName} onChange={e => setTopName(e.target.value)}>
+                <option value="">Choose a character</option>
+                {names.map(name => <option key={name} value={name}>{name}</option>)}
+              </select>
             </label>
             <label className="notification-check-field">
               <input type="checkbox" checked={autoCount} onChange={e => setAutoCount(e.target.checked)} />
@@ -633,6 +663,9 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
               <input value={countLine} onChange={e => setCountLine(e.target.value)} placeholder="2 New Notifications" />
             </label>}
             <div className="notification-edit-heading">Notification cards</div>
+            <datalist id="lockscreen-contact-names">
+              {names.map(name => <option key={name} value={name} />)}
+            </datalist>
             {cards.map((card, index) => (
               <div className="notification-edit-card" key={card.id}>
                 <div className="notification-edit-card-top">
@@ -647,7 +680,7 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
                   <input value={card.app} onChange={e => patchCard(card.id, { app: e.target.value })} placeholder="message" />
                 </label>
                 <label>Contact name
-                  <input value={card.sender} onChange={e => patchCard(card.id, { sender: e.target.value })} placeholder="Sender" />
+                  <input list="lockscreen-contact-names" value={card.sender} onChange={e => patchCard(card.id, { sender: e.target.value })} placeholder="Sender" />
                 </label>
                 <label>Message
                   <textarea rows={3} value={card.message} onChange={e => patchCard(card.id, { message: e.target.value })} placeholder="Type the notification…" />
@@ -679,7 +712,7 @@ function NotificationEditor({ pageRef, settings, setSettings, onExportPng, onExp
           <div className="pages-stage">
             <div ref={pageRef} className="book-page notification-book-page" style={{ width: settings.page.width + 'mm', fontFamily: settings.font }}>
               {topName && <div className="notification-top-name">{smartPunctuation(topName)}</div>}
-              <div className="notification-count-line">{smartPunctuation(heading)}</div>
+              {(autoCount ? cards.length > 0 : Boolean(heading)) && <div className="notification-count-line">{smartPunctuation(heading)}</div>}
               <div className="notification-preview-stack">
                 {cards.map(card => (
                   <div className="notification-preview-card" key={card.id}>
